@@ -1,26 +1,20 @@
-import React, { Component } from 'react';
-import { Link } from 'react-router-dom';
+import React, { useState } from 'react';
+import { Link, useHistory } from 'react-router-dom';
 
 import { Button, Card, CardBody, CardGroup, Col, Container, Form, Input, InputGroup, InputGroupAddon, InputGroupText, Row } from 'reactstrap';
 
-class Login extends Component {
-
-  constructor() {
-    super();
-
-    this.state = {
-      userName: '',
-      password: ''
-    }
-  }
-
-  dashboard = () => {
-    this.props.history.push('/dashboard');
-  }
+function Login() {
+  let history = useHistory();
+  const [userName, setUserName] = useState(null);
+  const [password, setPassword] = useState(null);
 
 
+  const dashboard = () => {
+    history.push('/dashboard');
+  };
 
-  login = (event) => {
+  const login = (event) => {
+    event.preventDefault();
     fetch('http://localhost:5000/api/userSessions', {
       method: 'post',
       headers: {
@@ -28,8 +22,8 @@ class Login extends Component {
         'Content-Type': 'application/*+json'
       },
       body: JSON.stringify({
-        userName: this.state.userName,
-        password: this.state.password
+        userName: userName,
+        password: password
       })
     }).then(json => {
       if(json.status === 500) return json.status;
@@ -37,16 +31,16 @@ class Login extends Component {
       }).then((result) => {
         if (result === 500) {
           alert('Invalid User');
+          console.log(userName,password)
       } else {
           let expiresAt = JSON.stringify(( (7*24*60*60) * 1000) + new Date().getTime());
           localStorage.setItem('access_token', result.token);
           localStorage.setItem('expires_at', expiresAt);
-          this.dashboard();
+          dashboard();
         }
       })
   };
 
-  render() {
     return (
       <div className="app flex-row align-items-center">
         <Container>
@@ -64,7 +58,7 @@ class Login extends Component {
                             <i className="icon-user"></i>
                           </InputGroupText>
                         </InputGroupAddon>
-                        <Input onChange={(event) => this.setState({userName:event.target.value})} type="text" placeholder="Username" autoComplete="username" />
+                        <Input onChange={(event) => setUserName(event.target.value)} type="text" placeholder="Username" autoComplete="username" />
                       </InputGroup>
                       <InputGroup className="mb-4">
                         <InputGroupAddon addonType="prepend">
@@ -72,11 +66,11 @@ class Login extends Component {
                             <i className="icon-lock"></i>
                           </InputGroupText>
                         </InputGroupAddon>
-                        <Input onChange={(event) => this.setState({password:event.target.value})} type="password" placeholder="Password" autoComplete="current-password" />
+                        <Input onChange={(event) => setPassword(event.target.value)} type="password" placeholder="Password" autoComplete="current-password" />
                       </InputGroup>
                       <Row>
                         <Col xs="6">
-                          <button onClick={this.login} className={'px-4 btn btn-primary'}> Login </button>
+                          <button onClick={login} className={'px-4 btn btn-primary'}> Login </button>
                         </Col>
                         <Col xs="6" className="text-right">
                           <Button  color="link" className="px-0">Forgot password?</Button>
@@ -103,7 +97,6 @@ class Login extends Component {
         </Container>
       </div>
     );
-  }
 }
 
 export default Login;

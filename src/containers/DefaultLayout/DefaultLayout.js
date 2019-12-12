@@ -1,5 +1,5 @@
-import React, { Component, Suspense } from 'react';
-import { Redirect, Route, Switch } from 'react-router-dom';
+import React, { Suspense, useEffect } from 'react';
+import { Redirect, Route, Switch, useHistory } from 'react-router-dom';
 import * as router from 'react-router-dom';
 import { Container } from 'reactstrap';
 
@@ -24,19 +24,24 @@ const DefaultAside = React.lazy(() => import('./DefaultAside'));
 const DefaultFooter = React.lazy(() => import('./DefaultFooter'));
 const DefaultHeader = React.lazy(() => import('./DefaultHeader'));
 
-class DefaultLayout extends Component {
+function DefaultLayout(props) {
+  let history = useHistory();
 
-  loading = () => <div className="animated fadeIn pt-1 text-center">Loading...</div>
+  useEffect(() => {
+    if(!isAuthenticated()) history.push('/login');
+  });
 
-  isAuthenticated = () => {
+  const loading = () => <div className="animated fadeIn pt-1 text-center">Loading...</div>
+
+  const isAuthenticated = () => {
     let expiresAt = JSON.parse(localStorage.getItem('expires_at'));
     return new Date().getTime() < expiresAt;
   };
 
-  signOut(e) {
+  const signOut = (e) => {
     e.preventDefault();
     let token = localStorage.getItem('access_token');
-    if(this.isAuthenticated() && token) {
+    if(isAuthenticated() && token) {
       fetch('http://localhost:5000/api/userSessions', {
         method: 'DELETE',
         headers: {
@@ -47,20 +52,19 @@ class DefaultLayout extends Component {
         if (result.status === 200) {
           localStorage.removeItem('access_token');
           localStorage.removeItem('expires_at');
-          this.props.history.push('/login');
+          history.push('/login');
         }
       })
     } else {
-      this.props.history.push('/login');
+      history.push('/login');
     }
-  }
+  };
 
-  render() {
     return (
       <div className="app">
         <AppHeader fixed>
-          <Suspense  fallback={this.loading()}>
-            <DefaultHeader onLogout={e=>this.signOut(e)}/>
+          <Suspense  fallback={loading()}>
+            <DefaultHeader onLogout={e=>signOut(e)}/>
           </Suspense>
         </AppHeader>
         <div className="app-body">
@@ -68,7 +72,7 @@ class DefaultLayout extends Component {
             <AppSidebarHeader />
             <AppSidebarForm />
             <Suspense>
-            <AppSidebarNav navConfig={navigation} {...this.props} router={router}/>
+            <AppSidebarNav navConfig={navigation} {...props} router={router}/>
             </Suspense>
             <AppSidebarFooter />
             <AppSidebarMinimizer />
@@ -76,7 +80,7 @@ class DefaultLayout extends Component {
           <main className="main">
             <AppBreadcrumb appRoutes={routes} router={router}/>
             <Container fluid>
-              <Suspense fallback={this.loading()}>
+              <Suspense fallback={loading()}>
                 <Switch>
                   {routes.map((route, idx) => {
                     return route.component ? (
@@ -96,19 +100,18 @@ class DefaultLayout extends Component {
             </Container>
           </main>
           <AppAside fixed>
-            <Suspense fallback={this.loading()}>
+            <Suspense fallback={loading()}>
               <DefaultAside />
             </Suspense>
           </AppAside>
         </div>
         <AppFooter>
-          <Suspense fallback={this.loading()}>
+          <Suspense fallback={loading()}>
             <DefaultFooter />
           </Suspense>
         </AppFooter>
       </div>
     );
-  }
 }
 
 export default DefaultLayout;

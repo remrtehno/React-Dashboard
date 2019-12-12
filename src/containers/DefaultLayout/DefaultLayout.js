@@ -28,9 +28,31 @@ class DefaultLayout extends Component {
 
   loading = () => <div className="animated fadeIn pt-1 text-center">Loading...</div>
 
+  isAuthenticated = () => {
+    let expiresAt = JSON.parse(localStorage.getItem('expires_at'));
+    return new Date().getTime() < expiresAt;
+  };
+
   signOut(e) {
-    e.preventDefault()
-    this.props.history.push('/login')
+    e.preventDefault();
+    let token = localStorage.getItem('access_token');
+    if(this.isAuthenticated() && token) {
+      fetch('http://localhost:5000/api/userSessions', {
+        method: 'DELETE',
+        headers: {
+          'Accept': '*/*',
+          'Authorization': 'Bearer ' + token
+        },
+      }).then((result) => {
+        if (result.status === 200) {
+          localStorage.removeItem('access_token');
+          localStorage.removeItem('expires_at');
+          this.props.history.push('/login');
+        }
+      })
+    } else {
+      this.props.history.push('/login');
+    }
   }
 
   render() {

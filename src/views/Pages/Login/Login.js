@@ -1,7 +1,7 @@
 import React, { Component } from 'react';
 import { Link } from 'react-router-dom';
-import { Button, Card, CardBody, CardGroup, Col, Container, Form, Input, InputGroup, InputGroupAddon, InputGroupText, Row } from 'reactstrap';
 
+import { Button, Card, CardBody, CardGroup, Col, Container, Form, Input, InputGroup, InputGroupAddon, InputGroupText, Row } from 'reactstrap';
 
 class Login extends Component {
 
@@ -15,27 +15,36 @@ class Login extends Component {
   }
 
   dashboard = () => {
-    this.props.history.push('/dashboard')
+    this.props.history.push('/dashboard');
   }
+
+
 
   login = (event) => {
     fetch('http://localhost:5000/api/userSessions', {
       method: 'post',
       headers: {
         'Accept': '*/*',
-        'Content-Type': 'application/json'
+        'Content-Type': 'application/*+json'
       },
       body: JSON.stringify({
         userName: this.state.userName,
         password: this.state.password
       })
-    }).then((result) => {
-        if (result.status === 500)
+    }).then(json => {
+      if(json.status === 500) return json.status;
+      return json.json()
+      }).then((result) => {
+        if (result === 500) {
           alert('Invalid User');
-       else
+      } else {
+          let expiresAt = JSON.stringify(( (7*24*60*60) * 1000) + new Date().getTime());
+          localStorage.setItem('access_token', result.token);
+          localStorage.setItem('expires_at', expiresAt);
           this.dashboard();
+        }
       })
-  }
+  };
 
   render() {
     return (

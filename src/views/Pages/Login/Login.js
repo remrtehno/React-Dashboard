@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
 import { Link, useHistory } from 'react-router-dom';
+import HOST_URL from '../../../constants';
 
 import { Button, Card, CardBody, CardGroup, Col, Container, Form, Input, InputGroup, InputGroupAddon, InputGroupText, Row } from 'reactstrap';
 
@@ -15,7 +16,7 @@ function Login() {
 
   const login = (event) => {
     event.preventDefault();
-    fetch('http://localhost:5000/api/userSessions', {
+    fetch(HOST_URL +'/api/userSessions', {
       method: 'post',
       headers: {
         'Accept': '*/*',

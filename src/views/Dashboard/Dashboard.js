@@ -1,4 +1,5 @@
 import React, { useEffect, useState } from 'react';
+import HOST_URL from '../../constants';
 
 import {
   Col,
@@ -48,7 +49,7 @@ function Dashboard() {
 
   const loadCharts = () => {
     let token = localStorage.getItem('access_token');
-    fetch('http://localhost:5000/api/skillaz-candidates/report', {
+    fetch(HOST_URL +'/api/skillaz-candidates/report', {
       method: 'GET',
       headers: {
         'Accept': 'text/json',

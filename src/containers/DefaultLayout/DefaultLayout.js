@@ -2,6 +2,7 @@ import React, { Suspense, useEffect } from 'react';
 import { Redirect, Route, Switch, useHistory } from 'react-router-dom';
 import * as router from 'react-router-dom';
 import { Container } from 'reactstrap';
+import HOST_URL from '../../constants/';
 
 import {
   AppAside,
@@ -42,7 +43,7 @@ function DefaultLayout(props) {
     e.preventDefault();
     let token = localStorage.getItem('access_token');
     if(isAuthenticated() && token) {
-      fetch('http://localhost:5000/api/userSessions', {
+      fetch(HOST_URL +'/api/userSessions', {
         method: 'DELETE',
         headers: {
           'Accept': '*/*',

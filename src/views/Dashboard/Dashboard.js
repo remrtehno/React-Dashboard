@@ -1,46 +1,39 @@
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useState, PureComponent } from 'react';
 import HOST_URL from '../../constants';
+import * as moment from 'moment';
+import _ from 'lodash';
 
 import {
   Col,
   Row,
 } from 'reactstrap';
-import {
+import { AreaChart, Area,
   ResponsiveContainer, BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, Legend,
 } from 'recharts';
 
-
 const formData = (array) => {
-  let dates = array.map((v,i)=>{
-    return v.fields.map(v=>v.key);
-  });
-
-  let data = [];
-  dates[0].forEach( vDates => {
-    array.forEach( (v) => {
-      let r = v.fields.find( vc => {
-        if(vc.key === vDates) return vc;
-      });
-      r.name = v.partnerName;
-      data.push(r);
+  const result = _.reduce(array, function(result, { fields, partnerName }) {
+    fields.forEach((field) => {
+      result[field.key] = result[field.key] || { key: moment(field.key).format("DD.MM.YYYY") };
+      result[field.key][partnerName] = field.candidateCount;
     });
-  });
-
-
-  let result = [];
-  data.forEach(function (a, i) {
-    if (!this[a.key]) {
-      this[a.key] = { key: a.key.replace(/\T.*/,''), };
-      result.push(this[a.key]);
-    }
-    //console.log(a.name, a.candidateCount ,'key:' + i);
-    let name = a.name.toString();
-    this[a.key][name] = a.candidateCount;
-  }, Object.create(null));
-
-  return result;
-
+    return result;
+  }, {});
+  return _.orderBy(result, [(o) => moment(o.key, 'DDMMYYYY').format("YYYYMMDD")] );
 };
+
+
+function CustomizedAxisTick(props) {
+  const {
+    x, y, payload,
+  } = props;
+
+  return (
+    <g transform={`translate(${x},${y})`}>
+      <text x={0} y={0} dy={16} textAnchor="end" fill="#666" transform="rotate(-35)">{payload.value}</text>
+    </g>
+  );
+}
 
 
 function Dashboard() {
@@ -61,7 +54,8 @@ function Dashboard() {
         return result.clone().json();
       }
     }).then((result) => {
-      setDataCharts({ monthly: formData(result.monthly)});
+      //console.log(window.p = result.monthly)
+      setDataCharts({ monthly: formData(result.monthly), weekly: formData(result.weekly)});
     });
   };
 
@@ -69,10 +63,13 @@ function Dashboard() {
     loadCharts();
   }, []);
 
+
+
+
   return (
     <div className="animated fadeIn">
       <Row>
-        <Col lg="12" className="mb-sm-2 mb-0">
+        <Col lg="12" className="mb-sm-5 mb-5">
           <h4 className="mb-4 text-center">Динамика по пройденным Интервью</h4>
           <div style={{ width: '100%', height: '300px'}}>
             <ResponsiveContainer>
@@ -88,14 +85,32 @@ function Dashboard() {
                 <Tooltip />
                 <Legend />
                 <Bar dataKey="Easyelead" fill="#446bc7" />
-
                 <Bar dataKey="Honeyleads" fill="#fb7207" />
-
                 <Bar dataKey="Лидген-ПрофитСейл" fill="#a5a5a5" />
-
                 <Bar dataKey="Яндекс" fill="#ffc100" />
-
               </BarChart>
+            </ResponsiveContainer>
+          </div>
+        </Col>
+        <Col lg="12" className="mb-sm- mb-5">
+          <h4 className="mb-4 text-center">Динамика по пройденным Интервью</h4>
+          <div style={{ width: '100%', height: '300px'}}>
+            <ResponsiveContainer>
+              <AreaChart
+                data={dataCharts.weekly}
+                margin={{
+                  top: 10, right: 30, left: 0, bottom: 0,
+                }}
+              >
+                <CartesianGrid strokeDasharray="3 3" />
+                <XAxis dataKey="key" interval={0} domain={['auto', 'auto']}  height={70} tick={<CustomizedAxisTick />} />
+                <YAxis />
+                <Tooltip />
+                <Area type="monotone" dataKey="Easyelead" stackId="1" stroke="#446bc7" fill="#446bc7" />
+                <Area type="monotone" dataKey="Honeyleads" stackId="1" stroke="#fb7207" fill="#fb7207" />
+                <Area type="monotone" dataKey="Лидген-ПрофитСейл" stackId="1" stroke="#a5a5a5" fill="#a5a5a5" />
+                <Area type="monotone" dataKey="Яндекс" stackId="1" stroke="#ffc100" fill="#ffc100" />
+              </AreaChart>
             </ResponsiveContainer>
           </div>
         </Col>

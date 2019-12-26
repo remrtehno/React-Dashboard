@@ -19,5 +19,10 @@ export default {
       url: '/',
       icon: 'icon-pie-chart',
     },
+    {
+      name: 'Таблицы',
+      url: '/tables',
+      icon: 'icon-pie-chart',
+    },
   ],
 };

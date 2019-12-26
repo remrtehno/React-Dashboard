@@ -3,6 +3,7 @@ import { MDBDataTable } from 'mdbreact';
 import HOST_URL from "../../constants";
 import {Col, Row} from "reactstrap";
 import _ from 'lodash';
+import moment from "moment";
 
 
 const formCity = (array) => {
@@ -26,8 +27,50 @@ const formCity = (array) => {
   }, []);
 };
 
+const formSocial = (array) => {
+  return _.reduce(array, (row, {fields, sourceName}) => {
+    fields.forEach(({key, interviewCount}) => {
+      const date = moment(key).format('DD.MM.YYYY');
+      const field = _.find(row, {sourceName: sourceName});
+      if (field) {
+        field[date] = interviewCount;
+        return;
+      }
+
+      let objField = { sourceName: sourceName, };
+      objField[date] = interviewCount;
+      row.push(objField);
+    });
+    return row;
+  }, []);
+};
+
+
+
+const returnSpecialFields = (array) => {
+ return _.reduce(array, (row, {fields}, index) => {
+  fields.forEach(({key}, index) => {
+    const date = moment(key).format('DD.MM.YYYY');
+    if(!_.find(row, (o) => o.field === date)) {
+      row.push({
+        label: date,
+        field: date,
+        sort: 'asc',
+        width: 150
+      });
+    }
+  });
+    return row;
+  }, [{
+  label: 'Названик',
+  field: 'sourceName',
+  sort: 'asc',
+  width: 150
+}]);
+};
+
 const DatatablePage = () => {
-  const [dataTable, setDataTable] = useState({ topCity: null });
+  const [dataTable, setDataTable] = useState({ topCity: null, utmWeekly: null,  });
 
   const loadTables = () => {
     let token = localStorage.getItem('access_token');
@@ -43,9 +86,8 @@ const DatatablePage = () => {
         return result.clone().json();
       }
     }).then((result) => {
-      console.log(window.p = result.topCity);
-      //console.log(formCity(result.topCity));
-      setDataTable({ topCity: formCity(result.topCity),});
+      console.log(window.p = result.utmWeekly, returnSpecialFields(result.utmWeekly) );
+      setDataTable({ topCity: formCity(result.topCity), utmWeekly: formSocial(result.utmWeekly), utmWeeklyDates: returnSpecialFields(result.utmWeekly) });
     });
   };
 
@@ -94,6 +136,11 @@ const DatatablePage = () => {
     ],
     rows: dataTable.topCity,
   };
+console.log();
+  const dataUTM = {
+    columns: dataTable.utmWeeklyDates,
+    rows: dataTable.utmWeekly,
+  };
 
   return (
     <div className="animated fadeIn">
@@ -105,6 +152,16 @@ const DatatablePage = () => {
             bordered
             hover
             data={data}
+          />
+        </Col>
+        <Col lg="12" className="mb-sm-5 mb-5">
+          <h4 className="mb-4 text-center">Социальные сети/Интервью</h4>
+          <MDBDataTable
+            responsive
+            striped
+            bordered
+            hover
+            data={dataUTM}
           />
         </Col>
       </Row>

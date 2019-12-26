@@ -11,7 +11,27 @@ import { AreaChart, Area,
   ResponsiveContainer, BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, Legend,
 } from 'recharts';
 
-const formData = (array) => {
+const formData = (data) => {
+  const result = _.reduce(data, function(points, { fields, partnerName }) {
+    fields.forEach(({ key, candidateCount }) => {
+      const date = moment(key).format('DD.MM.YYYY');
+      const point = _.find(points, { key: date });
+      if (point) {
+        point[partnerName] = candidateCount;
+        return;
+      }
+
+      points.push({
+        key: date,
+        [partnerName]: candidateCount
+      });
+    });
+    return points;
+  }, []);
+  return _.orderBy(result, [(o) => moment(o.key, 'DDMMYYYY').format("YYYYMMDD")] );
+};
+
+const formData2 = (array) => {
   const result = _.reduce(array, function(result, { fields, partnerName }) {
     fields.forEach((field) => {
       result[field.key] = result[field.key] || { key: moment(field.key).format("DD.MM.YYYY") };
@@ -21,7 +41,6 @@ const formData = (array) => {
   }, {});
   return _.orderBy(result, [(o) => moment(o.key, 'DDMMYYYY').format("YYYYMMDD")] );
 };
-
 
 function CustomizedAxisTick(props) {
   const {
@@ -35,11 +54,8 @@ function CustomizedAxisTick(props) {
   );
 }
 
-
 function Dashboard() {
-
   const [dataCharts, setDataCharts] = useState({ monthly: null });
-
   const loadCharts = () => {
     let token = localStorage.getItem('access_token');
     fetch(HOST_URL +'/api/skillaz-candidates/report', {
@@ -54,7 +70,6 @@ function Dashboard() {
         return result.clone().json();
       }
     }).then((result) => {
-      //console.log(window.p = result.monthly)
       setDataCharts({ monthly: formData(result.monthly), weekly: formData(result.weekly)});
     });
   };
@@ -62,9 +77,6 @@ function Dashboard() {
   useEffect( () => {
     loadCharts();
   }, []);
-
-
-
 
   return (
     <div className="animated fadeIn">

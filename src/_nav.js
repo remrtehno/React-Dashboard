@@ -24,5 +24,10 @@ export default {
       url: '/tables',
       icon: 'icon-pie-chart',
     },
+    {
+      name: 'Скачать отчет в Excel',
+      url: '/reports',
+      icon: 'icon-pie-chart',
+    },
   ],
 };

@@ -11,19 +11,19 @@ import { AreaChart, Area,
   ResponsiveContainer, BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, Legend,
 } from 'recharts';
 
-const formData = (data) => {
+const formData = (data, fieldSelect) => {
   const result = _.reduce(data, function(points, { fields, partnerName }) {
-    fields.forEach(({ key, candidateCount }) => {
+    fields.forEach(({ key, candidateCount, interviewCount }) => {
       const date = moment(key).format('DD.MM.YYYY');
       const point = _.find(points, { key: date });
       if (point) {
-        point[partnerName] = candidateCount;
+        point[partnerName] = (fieldSelect === false) ? candidateCount : interviewCount;
         return;
       }
 
       points.push({
         key: date,
-        [partnerName]: candidateCount
+        [partnerName]: fieldSelect === true ? candidateCount : interviewCount,
       });
     });
     return points;
@@ -55,7 +55,7 @@ function CustomizedAxisTick(props) {
 }
 
 function Dashboard() {
-  const [dataCharts, setDataCharts] = useState({ monthly: null });
+  const [dataCharts, setDataCharts] = useState({ monthly: null, monthlyInterview: null, weekly: null, weeklyInterview: null, });
   const loadCharts = () => {
     let token = localStorage.getItem('access_token');
     fetch(HOST_URL +'/api/skillaz-candidates/report', {
@@ -70,7 +70,7 @@ function Dashboard() {
         return result.clone().json();
       }
     }).then((result) => {
-      setDataCharts({ monthly: formData(result.monthly), weekly: formData(result.weekly)});
+      setDataCharts({ monthly: formData(result.monthly), monthlyInterview: formData(result.monthly, true), weekly: formData(result.weekly), weeklyInterview: formData(result.weekly, true),});
     });
   };
 
@@ -82,8 +82,8 @@ function Dashboard() {
     <div className="animated fadeIn">
       <Row>
         <Col lg="12" className="mb-sm-5 mb-5">
-          <h4 className="mb-4 text-center">Динамика по пройденным Интервью</h4>
-          <div style={{ width: '100%', height: '300px'}}>
+          <h4 className="mb-4 text-center">Динамика по количеству Кандидатов</h4>
+          <div style={{ width: '100%', height: '300px'}} className="mb-5">
             <ResponsiveContainer>
               <BarChart
                 data={dataCharts.monthly}
@@ -103,10 +103,31 @@ function Dashboard() {
               </BarChart>
             </ResponsiveContainer>
           </div>
+          <h4 className="mb-4 text-center">Динамика по пройденным Интервью</h4>
+          <div style={{ width: '100%', height: '300px'}} className="mb-5">
+            <ResponsiveContainer>
+              <BarChart
+                data={dataCharts.monthlyInterview}
+                margin={{
+                  top: 5, right: 0, left: 0, bottom: 5,
+                }}
+              >
+                <CartesianGrid strokeDasharray="3 3" />
+                <XAxis dataKey="key" />
+                <YAxis />
+                <Tooltip />
+                <Legend />
+                <Bar dataKey="Easyelead" fill="#446bc7" />
+                <Bar dataKey="Honeyleads" fill="#fb7207" />
+                <Bar dataKey="Лидген-ПрофитСейл" fill="#a5a5a5" />
+                <Bar dataKey="Яндекс" fill="#ffc100" />
+              </BarChart>
+            </ResponsiveContainer>
+          </div>
         </Col>
         <Col lg="12" className="mb-sm- mb-5">
-          <h4 className="mb-4 text-center">Динамика по пройденным Интервью</h4>
-          <div style={{ width: '100%', height: '300px'}}>
+          <h4 className="mb-4 text-center">Динамика по количеству Кандидатов</h4>
+          <div style={{ width: '100%', height: '300px'}} className="mb-5">
             <ResponsiveContainer>
               <AreaChart
                 data={dataCharts.weekly}
@@ -124,6 +145,26 @@ function Dashboard() {
                 <Area type="monotone" dataKey="Яндекс" stackId="1" stroke="#ffc100" fill="#ffc100" />
               </AreaChart>
             </ResponsiveContainer>
+          </div>
+            <h4 className="mb-4 text-center">Динамика по пройденным Интервью</h4>
+            <div style={{ width: '100%', height: '300px'}} className="mb-5">
+              <ResponsiveContainer>
+                <AreaChart
+                  data={dataCharts.weeklyInterview}
+                  margin={{
+                    top: 10, right: 30, left: 0, bottom: 0,
+                  }}
+                >
+                  <CartesianGrid strokeDasharray="3 3" />
+                  <XAxis dataKey="key" interval={0} domain={['auto', 'auto']}  height={70} tick={<CustomizedAxisTick />} />
+                  <YAxis />
+                  <Tooltip />
+                  <Area type="monotone" dataKey="Easyelead" stackId="1" stroke="#446bc7" fill="#446bc7" />
+                  <Area type="monotone" dataKey="Honeyleads" stackId="1" stroke="#fb7207" fill="#fb7207" />
+                  <Area type="monotone" dataKey="Лидген-ПрофитСейл" stackId="1" stroke="#a5a5a5" fill="#a5a5a5" />
+                  <Area type="monotone" dataKey="Яндекс" stackId="1" stroke="#ffc100" fill="#ffc100" />
+                </AreaChart>
+              </ResponsiveContainer>
           </div>
         </Col>
       </Row>

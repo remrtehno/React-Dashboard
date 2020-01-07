@@ -27,18 +27,18 @@ const formCity = (array) => {
   }, []);
 };
 
-const formSocial = (array) => {
+const formSocial = (array, fieldChoice) => {
   return _.reduce(array, (row, {fields, sourceName}) => {
-    fields.forEach(({key, interviewCount}) => {
+    fields.forEach(({key, interviewCount, candidateCount}) => {
       const date = moment(key).format('DD.MM.YYYY');
       const field = _.find(row, {sourceName: sourceName});
       if (field) {
-        field[date] = interviewCount;
+        field[date] = (fieldChoice === true) ? interviewCount : candidateCount;
         return;
       }
 
       let objField = { sourceName: sourceName, };
-      objField[date] = interviewCount;
+      objField[date] = (fieldChoice === true) ? interviewCount : candidateCount;
       row.push(objField);
     });
     return row;
@@ -70,7 +70,7 @@ const returnSpecialFields = (array) => {
 };
 
 const DatatablePage = () => {
-  const [dataTable, setDataTable] = useState({ topCity: null, utmWeekly: null,  });
+  const [dataTable, setDataTable] = useState({ topCity: null, utmWeekly: null, utmWeeklyCandidate: null, utmWeeklyDates: null, });
 
   const loadTables = () => {
     let token = localStorage.getItem('access_token');
@@ -86,8 +86,7 @@ const DatatablePage = () => {
         return result.clone().json();
       }
     }).then((result) => {
-      console.log(window.p = result.utmWeekly, returnSpecialFields(result.utmWeekly) );
-      setDataTable({ topCity: formCity(result.topCity), utmWeekly: formSocial(result.utmWeekly), utmWeeklyDates: returnSpecialFields(result.utmWeekly) });
+      setDataTable({ topCity: formCity(result.topCity), utmWeekly: formSocial(result.utmWeekly, true), utmWeeklyCandidate: formSocial(result.utmWeekly), utmWeeklyDates: returnSpecialFields(result.utmWeekly) });
     });
   };
 
@@ -136,10 +135,13 @@ const DatatablePage = () => {
     ],
     rows: dataTable.topCity,
   };
-console.log();
   const dataUTM = {
     columns: dataTable.utmWeeklyDates,
     rows: dataTable.utmWeekly,
+  };
+  const dataUTMCandidate = {
+    columns: dataTable.utmWeeklyDates,
+    rows: dataTable.utmWeeklyCandidate,
   };
 
   return (
@@ -152,6 +154,16 @@ console.log();
             bordered
             hover
             data={data}
+          />
+        </Col>
+        <Col lg="12" className="mb-sm-5 mb-5">
+          <h4 className="mb-4 text-center">Социальные сети/Кандидаты</h4>
+          <MDBDataTable
+            responsive
+            striped
+            bordered
+            hover
+            data={dataUTMCandidate}
           />
         </Col>
         <Col lg="12" className="mb-sm-5 mb-5">

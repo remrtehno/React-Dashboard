@@ -55,7 +55,6 @@ class Navbars extends Component {
           </CardHeader>
           <CardBody>
             <Navbar color="info" light expand="md">
-              <NavbarBrand href="/">Bootstrap</NavbarBrand>
               <NavbarToggler onClick={this.toggle} />
               <Collapse isOpen={this.state.isOpen} navbar>
                 <Nav className="ml-auto" navbar>
@@ -95,7 +94,6 @@ class Navbars extends Component {
           </CardHeader>
           <CardBody>
             <Navbar color="success" light>
-              <NavbarBrand href="/" className="mr-auto">Bootstrap</NavbarBrand>
               <NavbarToggler onClick={this.toggleNavbar} className="mr-2" />
               <Collapse isOpen={!this.state.collapsed} navbar>
                 <Nav navbar>

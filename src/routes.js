@@ -40,8 +40,8 @@ const Reports = React.lazy(() => import('./views/Reports'));
 
 // https://github.com/ReactTraining/react-router/tree/master/packages/react-router-config
 const routes = [
-  { path: '/', exact: true, name: 'Home' },
-  { path: '/dashboard', name: 'Dashboard', component: Dashboard },
+  { path: '/', exact: true, name: 'Главная' },
+  { path: '/dashboard', name: 'Главная', component: Dashboard },
   { path: '/tables', name: 'Таблицы', component: TablesMd },
   { path: '/theme', exact: true, name: 'Theme', component: Colors },
   { path: '/theme/colors', name: 'Colors', component: Colors },
@@ -80,7 +80,7 @@ const routes = [
   { path: '/notifications/modals', name: 'Modals', component: Modals },
   { path: '/widgets', name: 'Widgets', component: Widgets },
   { path: '/charts', name: 'Charts', component: Charts },
-  { path: '/users', exact: true,  name: 'Users', component: Users },
+  { path: '/users', exact: true,  name: 'Пользователи', component: Users },
   { path: '/users/:id', exact: true, name: 'User Details', component: User },
   { path: '/reports', exact: true, name: 'Скачать в Excel', component: Reports },
 ];

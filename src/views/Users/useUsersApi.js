@@ -1,3 +1,28 @@
+import HOST_URL from "../../constants";
+import {useState} from "react";
+
+function useUsersApi() {
+  const [users, setUsers] = useState([]);
+  const token = localStorage.getItem('access_token');
+  
+  const loadUsers = () => {
+      fetch(HOST_URL +'/api/users', {
+        method: 'get',
+        headers: {
+          'Accept': 'text/plain',
+          'Authorization': 'Bearer ' + token
+        },
+      }).then((result) => {
+        if (result.status === 200) {
+          return result.clone().json();
+        }
+      }).then((result) => {
+        setUsers(result);
+      });
+    };
+  return [users, loadUsers];
+}
+
 const usersData = [
   {id: 0, name: 'John Doe', registered: '2018/01/01', role: 'Guest', status: 'Pending'},
   {id: 1, name: 'Samppa Nori', registered: '2018/01/01', role: 'Member', status: 'Active'},
@@ -28,4 +53,4 @@ const usersData = [
   {id: 42, name: 'Ford Prefex', registered: '2001/05/21', role: 'Alien', status: 'Don\'t panic!'}
 ]
 
-export default usersData
+export default useUsersApi;

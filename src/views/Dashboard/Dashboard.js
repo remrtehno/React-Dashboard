@@ -1,4 +1,4 @@
-import React, { useEffect, useState, PureComponent } from 'react';
+import React, { useEffect, useState } from 'react';
 import HOST_URL from '../../constants';
 import * as moment from 'moment';
 import _ from 'lodash';
@@ -17,7 +17,7 @@ const formData = (data, fieldSelect) => {
       const date = moment(key).format('DD.MM.YYYY');
       const point = _.find(points, { key: date });
       if (point) {
-        point[partnerName] = (fieldSelect === false) ? candidateCount : interviewCount;
+        point[partnerName] = (fieldSelect === true) ? candidateCount : interviewCount;
         return;
       }
 
@@ -31,16 +31,16 @@ const formData = (data, fieldSelect) => {
   return _.orderBy(result, [(o) => moment(o.key, 'DDMMYYYY').format("YYYYMMDD")] );
 };
 
-const formData2 = (array) => {
-  const result = _.reduce(array, function(result, { fields, partnerName }) {
-    fields.forEach((field) => {
-      result[field.key] = result[field.key] || { key: moment(field.key).format("DD.MM.YYYY") };
-      result[field.key][partnerName] = field.candidateCount;
-    });
-    return result;
-  }, {});
-  return _.orderBy(result, [(o) => moment(o.key, 'DDMMYYYY').format("YYYYMMDD")] );
-};
+// const formData2 = (array) => {
+//   const result = _.reduce(array, function(result, { fields, partnerName }) {
+//     fields.forEach((field) => {
+//       result[field.key] = result[field.key] || { key: moment(field.key).format("DD.MM.YYYY") };
+//       result[field.key][partnerName] = field.candidateCount;
+//     });
+//     return result;
+//   }, {});
+//   return _.orderBy(result, [(o) => moment(o.key, 'DDMMYYYY').format("YYYYMMDD")] );
+// };
 
 function CustomizedAxisTick(props) {
   const {
@@ -82,7 +82,7 @@ function Dashboard() {
     <div className="animated fadeIn">
       <Row>
         <Col lg="12" className="mb-sm-5 mb-5">
-          <h4 className="mb-4 text-center">Динамика по количеству Кандидатов</h4>
+          <h4 className="mb-4 text-center">Динамика по количеству Интервью</h4>
           <div style={{ width: '100%', height: '300px'}} className="mb-5">
             <ResponsiveContainer>
               <BarChart
@@ -103,7 +103,7 @@ function Dashboard() {
               </BarChart>
             </ResponsiveContainer>
           </div>
-          <h4 className="mb-4 text-center">Динамика по пройденным Интервью</h4>
+          <h4 className="mb-4 text-center">Динамика по пройденным Кандидатов</h4>
           <div style={{ width: '100%', height: '300px'}} className="mb-5">
             <ResponsiveContainer>
               <BarChart
@@ -126,7 +126,7 @@ function Dashboard() {
           </div>
         </Col>
         <Col lg="12" className="mb-sm- mb-5">
-          <h4 className="mb-4 text-center">Динамика по количеству Кандидатов</h4>
+          <h4 className="mb-4 text-center">Динамика по количеству Интервью</h4>
           <div style={{ width: '100%', height: '300px'}} className="mb-5">
             <ResponsiveContainer>
               <AreaChart
@@ -146,7 +146,7 @@ function Dashboard() {
               </AreaChart>
             </ResponsiveContainer>
           </div>
-            <h4 className="mb-4 text-center">Динамика по пройденным Интервью</h4>
+            <h4 className="mb-4 text-center">Динамика по пройденным Кандидатов </h4>
             <div style={{ width: '100%', height: '300px'}} className="mb-5">
               <ResponsiveContainer>
                 <AreaChart

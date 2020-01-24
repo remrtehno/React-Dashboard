@@ -29,5 +29,10 @@ export default {
       url: '/reports',
       icon: 'icon-pie-chart',
     },
+    {
+      name: 'Пользователи',
+      url: '/users',
+      icon: 'icon-settings',
+    },
   ],
 };

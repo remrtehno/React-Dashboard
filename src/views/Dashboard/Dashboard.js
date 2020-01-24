@@ -7,7 +7,7 @@ import {
   Col,
   Row,
 } from 'reactstrap';
-import { AreaChart, Area,
+import { AreaChart, Area,Brush,
   ResponsiveContainer, BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, Legend,
 } from 'recharts';
 
@@ -128,7 +128,7 @@ function Dashboard() {
         <Col lg="12" className="mb-sm- mb-5">
           <h4 className="mb-4 text-center">Динамика по количеству Интервью</h4>
           <div style={{ width: '100%', height: '300px'}} className="mb-5">
-            <ResponsiveContainer>
+          <ResponsiveContainer>
               <AreaChart
                 data={dataCharts.weekly}
                 margin={{
@@ -139,16 +139,17 @@ function Dashboard() {
                 <XAxis dataKey="key" interval={0} domain={['auto', 'auto']}  height={70} tick={<CustomizedAxisTick />} />
                 <YAxis />
                 <Tooltip />
+                <Brush dataKey='key' height={30} stroke="#8884d8"/>
                 <Area type="monotone" dataKey="Easyelead" stackId="1" stroke="#446bc7" fill="#446bc7" />
                 <Area type="monotone" dataKey="Honeyleads" stackId="1" stroke="#fb7207" fill="#fb7207" />
                 <Area type="monotone" dataKey="Лидген-ПрофитСейл" stackId="1" stroke="#a5a5a5" fill="#a5a5a5" />
                 <Area type="monotone" dataKey="Яндекс" stackId="1" stroke="#ffc100" fill="#ffc100" />
               </AreaChart>
-            </ResponsiveContainer>
+          </ResponsiveContainer>
           </div>
             <h4 className="mb-4 text-center">Динамика по пройденным Кандидатов </h4>
             <div style={{ width: '100%', height: '300px'}} className="mb-5">
-              <ResponsiveContainer>
+            <ResponsiveContainer>
                 <AreaChart
                   data={dataCharts.weeklyInterview}
                   margin={{
@@ -159,12 +160,13 @@ function Dashboard() {
                   <XAxis dataKey="key" interval={0} domain={['auto', 'auto']}  height={70} tick={<CustomizedAxisTick />} />
                   <YAxis />
                   <Tooltip />
+                  <Brush dataKey='key' height={30} stroke="#8884d8"/>
                   <Area type="monotone" dataKey="Easyelead" stackId="1" stroke="#446bc7" fill="#446bc7" />
                   <Area type="monotone" dataKey="Honeyleads" stackId="1" stroke="#fb7207" fill="#fb7207" />
                   <Area type="monotone" dataKey="Лидген-ПрофитСейл" stackId="1" stroke="#a5a5a5" fill="#a5a5a5" />
                   <Area type="monotone" dataKey="Яндекс" stackId="1" stroke="#ffc100" fill="#ffc100" />
                 </AreaChart>
-              </ResponsiveContainer>
+            </ResponsiveContainer>
           </div>
         </Col>
       </Row>

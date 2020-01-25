@@ -4,14 +4,13 @@ import { Card, CardBody, CardHeader, Col, Row, Table } from 'reactstrap';
 import useUsersApi from './useUsersApi'
 
 function User(props) {
-  const [users, loadUsers] = useUsersApi();
+  const [users, loadUsers] = useUsersApi(props.match.params.id);
 
   useEffect(() => {
     loadUsers();
   }, []);
 
-    const user =  users.find( user => user.userName.toString() === props.match.params.id);
-    const userDetails = user ? Object.entries(user) : [['id', (<span><i className="text-muted icon-ban"></i> Not found</span>)]];
+    const userDetails = users.identity ? Object.entries(users.identity) : [['id', (<span><i className="text-muted icon-ban"></i> Not found</span>)]];
 
     return (
       <div className="animated fadeIn">

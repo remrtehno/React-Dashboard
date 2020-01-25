@@ -1,12 +1,12 @@
 import HOST_URL from "../../constants";
 import {useState} from "react";
 
-function useUsersApi() {
+function useUsersApi(userName = '') {
   const [users, setUsers] = useState([]);
   const token = localStorage.getItem('access_token');
   
   const loadUsers = () => {
-      fetch(HOST_URL +'/api/users', {
+      fetch(HOST_URL +`/api/users/${userName}`, {
         method: 'get',
         headers: {
           'Accept': 'text/plain',

@@ -83,7 +83,7 @@ function Dashboard() {
       <Row>
         <Col lg="12" className="mb-sm-5 mb-5">
           <h4 className="mb-5 font-weight-light text-uppercase"> Обновлено: 29.01.2020 19:47 </h4>
-          <h4 className="mb-4 text-center">Динамика по количеству Интервью</h4>
+          <h4 className="mb-4 text-center">Динамика по пройденным Интервью</h4>
           <div style={{ width: '100%', height: '300px'}} className="mb-5">
             <ResponsiveContainer>
               <BarChart
@@ -104,7 +104,7 @@ function Dashboard() {
               </BarChart>
             </ResponsiveContainer>
           </div>
-          <h4 className="mb-4 text-center">Динамика по пройденным Кандидатов</h4>
+          <h4 className="mb-4 text-center">Динамика по количеству Кандидатов</h4>
           <div style={{ width: '100%', height: '300px'}} className="mb-5">
             <ResponsiveContainer>
               <BarChart
@@ -127,7 +127,7 @@ function Dashboard() {
           </div>
         </Col>
         <Col lg="12" className="mb-sm- mb-5">
-          <h4 className="mb-4 text-center">Динамика по количеству Интервью</h4>
+          <h4 className="mb-4 text-center">Динамика по пройденным Интервью</h4>
           <div style={{ width: '100%', height: '300px'}} className="mb-5">
           <ResponsiveContainer>
               <AreaChart
@@ -148,7 +148,7 @@ function Dashboard() {
               </AreaChart>
           </ResponsiveContainer>
           </div>
-            <h4 className="mb-4 text-center">Динамика по пройденным Кандидатов </h4>
+            <h4 className="mb-4 text-center">Динамика по количеству Кандидатов </h4>
             <div style={{ width: '100%', height: '300px'}} className="mb-5">
             <ResponsiveContainer>
                 <AreaChart

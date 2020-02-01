@@ -15,7 +15,12 @@ function UserRow(props) {
       <td><Link to={userLink}>{user.userName}</Link></td>
       <td>{user.registered}</td>
       <td>{user.role}</td>
-      <td><Button block color="primary">Удалить</Button> <Button block color="primary">Редактировать</Button></td>
+      <td>
+        <Link to={`/users/edit/${user.userName}`}>
+          <Button className='mb-2' block color="primary">Редактировать</Button>
+        </Link>
+        <Button block color="primary">Удалить</Button>
+      </td>
     </tr>
   )
 }
@@ -26,7 +31,6 @@ function Users() {
   useEffect(() => {
     loadUsers();
   }, []);
-
 
   return (
     <div className="animated fadeIn">

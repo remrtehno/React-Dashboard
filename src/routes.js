@@ -35,6 +35,7 @@ const Typography = React.lazy(() => import('./views/Theme/Typography'));
 const Widgets = React.lazy(() => import('./views/Widgets/Widgets'));
 const Users = React.lazy(() => import('./views/Users/Users'));
 const User = React.lazy(() => import('./views/Users/User'));
+const UserEdit = React.lazy(() => import('./views/Users/UserEdit'));
 const TablesMd = React.lazy(() => import('./views/Tables'));
 const Reports = React.lazy(() => import('./views/Reports'));
 
@@ -81,7 +82,8 @@ const routes = [
   { path: '/widgets', name: 'Widgets', component: Widgets },
   { path: '/charts', name: 'Charts', component: Charts },
   { path: '/users', exact: true,  name: 'Пользователи', component: Users },
-  { path: '/users/:id', exact: true, name: 'User Details', component: User },
+  { path: '/users/:id', exact: true, name: 'Просмотр профиля', component: User },
+  { path: '/users/edit/:id', exact: true, name: 'Редактировать профиль', component: UserEdit },
   { path: '/reports', exact: true, name: 'Скачать в Excel', component: Reports },
 ];
 

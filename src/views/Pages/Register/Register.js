@@ -51,12 +51,6 @@ function Register() {
       });
     };
 
-    // useEffect( () => {
-    //   //loadCharts();
-    // }, []);
-
-
-
     return (
       <div className="app flex-row align-items-center">
         <Container>

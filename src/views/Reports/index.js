@@ -29,8 +29,12 @@ const Reports = () => {
     <div className="animated fadeIn">
       <Row>
         <Col lg="12" className="mb-sm-5 mb-5">
-          <h4 className="mb-4 text-center">Города с самым большим числом Интервью за прериод</h4>
-          <a href="#" onClick={executeRequest}> Скачать </a>
+          <h4 className="mb-5 font-weight-light text-uppercase"> Обновлено: 29.01.2020 19:47 </h4>
+          <h4 className="mb-4 text-uppercase">Подробный отчет по всем партнерам</h4>
+          <a href="#" className="btn-download" onClick={executeRequest}> Скачать </a>
+          <div className="mb-sm-5 mb-5"> </div>
+          <h4 className="mb-4 text-uppercase">Источники Honeyleads</h4>
+          <a href="#" className="btn-download" onClick={executeRequest}> Скачать </a>
         </Col>
       </Row>
     </div>

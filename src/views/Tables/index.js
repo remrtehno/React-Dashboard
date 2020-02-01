@@ -148,7 +148,8 @@ const DatatablePage = () => {
     <div className="animated fadeIn">
       <Row>
         <Col lg="12" className="mb-sm-5 mb-5">
-          <h4 className="mb-4 text-center">Города с самым большим числом Интервью за прериод</h4>
+          <h4 className="mb-5 font-weight-light text-uppercase"> Обновлено: 29.01.2020 19:47 </h4>
+          <h4 className="mb-4 text-center">Города с самым большим числом Интервью за период</h4>
           <MDBDataTable
             striped
             bordered
@@ -157,7 +158,7 @@ const DatatablePage = () => {
           />
         </Col>
         <Col lg="12" className="mb-sm-5 mb-5">
-          <h4 className="mb-4 text-center">Социальные сети/Кандидаты</h4>
+          <h4 className="mb-4 text-center">Источники/Кандидаты</h4>
           <MDBDataTable
             responsive
             striped
@@ -167,7 +168,7 @@ const DatatablePage = () => {
           />
         </Col>
         <Col lg="12" className="mb-sm-5 mb-5">
-          <h4 className="mb-4 text-center">Социальные сети/Интервью</h4>
+          <h4 className="mb-4 text-center">Источники/Интервью</h4>
           <MDBDataTable
             responsive
             striped

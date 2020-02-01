@@ -36,14 +36,15 @@ const Widgets = React.lazy(() => import('./views/Widgets/Widgets'));
 const Users = React.lazy(() => import('./views/Users/Users'));
 const User = React.lazy(() => import('./views/Users/User'));
 const UserEdit = React.lazy(() => import('./views/Users/UserEdit'));
+const UserCreate = React.lazy(() => import('./views/Users/UserCreate'));
 const TablesMd = React.lazy(() => import('./views/Tables'));
 const Reports = React.lazy(() => import('./views/Reports'));
 
 // https://github.com/ReactTraining/react-router/tree/master/packages/react-router-config
 const routes = [
   { path: '/', exact: true, name: 'Главная' },
-  { path: '/dashboard', name: 'Главная', component: Dashboard },
-  { path: '/tables', name: 'Таблицы', component: TablesMd },
+  { path: '/dashboard', name: 'Динамика', component: Dashboard },
+  { path: '/tables', name: 'Источники', component: TablesMd },
   { path: '/theme', exact: true, name: 'Theme', component: Colors },
   { path: '/theme/colors', name: 'Colors', component: Colors },
   { path: '/theme/typography', name: 'Typography', component: Typography },
@@ -82,8 +83,9 @@ const routes = [
   { path: '/widgets', name: 'Widgets', component: Widgets },
   { path: '/charts', name: 'Charts', component: Charts },
   { path: '/users', exact: true,  name: 'Пользователи', component: Users },
-  { path: '/users/:id', exact: true, name: 'Просмотр профиля', component: User },
-  { path: '/users/edit/:id', exact: true, name: 'Редактировать профиль', component: UserEdit },
+  { path: '/users/:id', exact: true, name: 'Просмотр пользователя', component: User },
+  { path: '/users/edit/:id', exact: true, name: 'Редактировать пользователя', component: UserEdit },
+  { path: '/users/create', exact: true, name: 'Создать пользователя', component: UserCreate },
   { path: '/reports', exact: true, name: 'Скачать в Excel', component: Reports },
 ];
 

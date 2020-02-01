@@ -57,7 +57,7 @@ function Users() {
                   )}
                 </tbody>
               </Table>
-              <Button block color="primary">Добавить нового пользователя</Button>
+              <Link to={`/users/create`}><Button block color="primary">Добавить нового пользователя</Button></Link>
             </CardBody>
           </Card>
         </Col>

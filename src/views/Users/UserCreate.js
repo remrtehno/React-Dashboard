@@ -70,7 +70,7 @@ function User(props) {
                   })
                 }
                 <tr>
-                  <Button onClick={()=> sendFields()} block color="primary">Сохранить</Button>
+                  <Button onClick={()=> sendFields()} block color="primary">Создать</Button>
                 </tr>
                 </tbody>
               </Table>

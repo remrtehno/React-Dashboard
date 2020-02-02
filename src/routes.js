@@ -85,7 +85,7 @@ const routes = [
   { path: '/users', exact: true,  name: 'Пользователи', component: Users },
   { path: '/users/:id', exact: true, name: 'Просмотр пользователя', component: User },
   { path: '/users/edit/:id', exact: true, name: 'Редактировать пользователя', component: UserEdit },
-  { path: '/users/create', exact: true, name: 'Создать пользователя', component: UserCreate },
+  { path: '/user/create/', exact: true, name: 'Создать пользователя', component: UserCreate },
   { path: '/reports', exact: true, name: 'Скачать в Excel', component: Reports },
 ];
 

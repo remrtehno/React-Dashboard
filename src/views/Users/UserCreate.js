@@ -1,16 +1,29 @@
-import React, {useEffect, useRef, useState} from 'react';
-import {Button, Card, CardBody, CardHeader, Col, Input, Row, Table} from 'reactstrap';
+import React, {useEffect, useState} from 'react';
+import {Button, Card, CardBody, Col, Input, Row, Table} from 'reactstrap';
 import _ from 'lodash';
 import HOST_URL from "../../constants";
 
 function User(props) {
-  const [user, setUser] = useState([]);
-  const userId = props.match.params.id;
-  const changedFields = _.cloneDeep(user.identity);
-  const token = localStorage.getItem('access_token');
+  const [user, setUser] = useState({
+    "userName": "string",
+    "password": "string",
+    "tenantId": 0,
+    "roleId": "string",
+    "identity": {
+      "email": "string",
+      "phoneNumber": "string",
+      "lastName": "string",
+      "firstName": "string",
+      "middleName": "string",
+      "position": "string"
+    }
+  });
+
+  const changedFields = _.cloneDeep(user);
 
   const sendFields = () => {
-    fetch(HOST_URL +`/api/users/${userId}/identity/change`, {
+    const token = localStorage.getItem('access_token');
+    fetch(HOST_URL +`/api/users`, {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
@@ -18,52 +31,46 @@ function User(props) {
       },
       body: JSON.stringify(changedFields),
     }).then((result) => {
+      console.log(result);
       if (result.status === 200) {
         window.location.reload();
       }
     });
   };
 
-  const loadUser = () => {
-    fetch(HOST_URL +`/api/users/${userId}`, {
-      method: 'get',
-      headers: {
-        'Accept': 'text/plain',
-        'Authorization': 'Bearer ' + token
-      },
-    }).then((result) => {
-      if (result.status === 200) {
-        return result.clone().json();
-      }
-    }).then((result) => {
-      setUser(result);
-    });
-  };
-
-  useEffect(() => {
-    loadUser(userId);
-  }, []);
-
-  const userDetails = user.identity ? Object.entries(user.identity) : [['id', (<span><i className="text-muted icon-ban"></i> Not found</span>)]];
-
   return (
     <div className="animated fadeIn">
       <Row>
         <Col lg={6}>
           <Card>
-            <CardHeader>
-              <strong><i className="icon-info pr-1"></i>User id: {userId}</strong>
-            </CardHeader>
             <CardBody>
               <Table responsive striped hover>
                 <tbody>
                 {
-                  userDetails.map(([key, value]) => {
+                  _.map(user, (value, key) => {
+                    if(_.isObject(value)) {
+                      return _.map(value, (recurseValue, recurseKey)=> {
+                        return (
+                          <tr key={recurseKey}>
+                            <td>{`${recurseKey}:`}</td>
+                            <td><strong>
+                              <Input type="text" onChange={(event) => {
+                                if(!changedFields.identity) {
+                                  changedFields.identity = { [recurseKey]: event.target.value }
+                                } else {
+                                  changedFields.identity[recurseKey] = event.target.value;
+                                }
+                              }} placeholder={recurseValue}  />
+                            </strong></td>
+                          </tr>
+                        )
+                      })
+                    }
                     return (
                       <tr key={key}>
                         <td>{`${key}:`}</td>
                         <td><strong>
-                          <Input type="text" onChange={(event) => { changedFields[key] = event.target.value } } placeholder={value} autoComplete="username" />
+                          <Input type="text" onChange={(event) => { changedFields[key] = event.target.value } } placeholder={value}  />
                         </strong></td>
                       </tr>
                     )

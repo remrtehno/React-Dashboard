@@ -45,8 +45,6 @@ const formSocial = (array, fieldChoice) => {
   }, []);
 };
 
-
-
 const returnSpecialFields = (array) => {
  return _.reduce(array, (row, {fields}, index) => {
   fields.forEach(({key}, index) => {

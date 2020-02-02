@@ -34,5 +34,10 @@ export default {
       url: '/users',
       icon: 'icon-settings',
     },
+    {
+      name: 'Регионы',
+      url: '/regions',
+      icon: 'icon-settings',
+    },
   ],
 };

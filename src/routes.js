@@ -39,6 +39,7 @@ const UserEdit = React.lazy(() => import('./views/Users/UserEdit'));
 const UserCreate = React.lazy(() => import('./views/Users/UserCreate'));
 const TablesMd = React.lazy(() => import('./views/Tables'));
 const Reports = React.lazy(() => import('./views/Reports'));
+const Regoins = React.lazy(() => import('./views/Regoins'));
 
 // https://github.com/ReactTraining/react-router/tree/master/packages/react-router-config
 const routes = [
@@ -87,6 +88,7 @@ const routes = [
   { path: '/users/edit/:id', exact: true, name: 'Редактировать пользователя', component: UserEdit },
   { path: '/user/create/', exact: true, name: 'Создать пользователя', component: UserCreate },
   { path: '/reports', exact: true, name: 'Скачать в Excel', component: Reports },
+  { path: '/regions', exact: true, name: 'Регионы', component: Regoins },
 ];
 
 export default routes;

@@ -3,6 +3,7 @@ import { Link } from 'react-router-dom';
 import {Button, Card, CardBody, CardHeader, Col, Row, Table} from 'reactstrap';
 
 import useUsersApi from './useUsersApi';
+import {deleteUser, changePassword} from './useUsersApi';
 
 
 function UserRow(props) {
@@ -11,7 +12,6 @@ function UserRow(props) {
 
   return (
     <tr key={user.toString()}>
-      <th scope="row"><Link to={userLink}>{user.id}</Link></th>
       <td><Link to={userLink}>{user.userName}</Link></td>
       <td>{user.registered}</td>
       <td>{user.role}</td>
@@ -19,7 +19,8 @@ function UserRow(props) {
         <Link to={`/users/edit/${user.userName}`}>
           <Button className='mb-2' block color="primary">Редактировать</Button>
         </Link>
-        <Button block color="primary">Удалить</Button>
+        <Button onClick={ changePassword() } className='mb-2' block color="primary">Сбросить пароль</Button>
+        <Button onClick={ () => deleteUser(user.userName) } block color="primary">Удалить</Button>
       </td>
     </tr>
   )
@@ -44,7 +45,6 @@ function Users() {
               <Table responsive hover>
                 <thead>
                   <tr>
-                    <th scope="col">id</th>
                     <th scope="col">name</th>
                     <th scope="col">registered</th>
                     <th scope="col">role</th>

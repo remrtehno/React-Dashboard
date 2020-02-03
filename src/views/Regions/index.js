@@ -160,6 +160,7 @@ const Reports = () => {
                 <td> Город </td>
                 <td> Тип </td>
                 <td> Utm </td>
+                <td> Регион </td>
                 <td> Действие </td>
               </tr>
               {
@@ -169,6 +170,11 @@ const Reports = () => {
                       <td>{`${value.name}`}</td>
                       <td>{`${value.nameDative}`}</td>
                       <td>{`${value.utm}`}</td>
+                      <td>
+                        { value.yandexRegions.map( regions => {
+                          return regions.name + ', ';
+                        }) }
+                      </td>
                       <td>
                         <div className="row align-items-center">
                           <Link to={`regions/edit/${value.id}`} className="col-6">

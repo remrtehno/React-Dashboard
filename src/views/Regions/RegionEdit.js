@@ -7,23 +7,23 @@ import _ from 'lodash';
 const RegionEdit = (props) => {
   const regionId = props.match.params.id;
   const [region, setRegion] = useState({});
-  const [allRegion, setAllRegion] = useState({});
+  const [allRegion, setAllRegion] = useState([]);
 
   const loadRegion = () => {
-    // const token = localStorage.getItem('access_token');
-    // fetch(HOST_URL +`/api/regions/${regionId}`, {
-    //   method: 'GET',
-    //   headers: {
-    //     'Accept': 'text/plain',
-    //     'Authorization': 'Bearer ' + token
-    //   },
-    // }).then((result) => {
-    //   if (result.status === 200) {
-    //     return result.clone().json()
-    //   }
-    // }).then((result) => {
-    //   setRegion(result);
-    // });
+    const token = localStorage.getItem('access_token');
+    fetch(HOST_URL +`/api/regions/${regionId}`, {
+      method: 'GET',
+      headers: {
+        'Accept': 'text/plain',
+        'Authorization': 'Bearer ' + token
+      },
+    }).then((result) => {
+      if (result.status === 200) {
+        return result.clone().json()
+      }
+    }).then((result) => {
+      setRegion(result);
+    });
   };
 
   const getAllRegions = (query = "") => {
@@ -34,23 +34,23 @@ const RegionEdit = (props) => {
     let params = {search: query};
     Object.keys(params).forEach(key => url.searchParams.append(key, params[key]));
 
-    // fetch(url, {
-    //   method: 'GET',
-    //   headers: {
-    //     'Accept': 'text/plain',
-    //     'Authorization': 'Bearer ' + token
-    //   },
-    // }).then((result) => {
-    //   if (result.status === 200) {
-    //     return result.clone().json()
-    //   }
-    // }).then((result) => {
-    //   setAllRegion(
-    //     _.map(result.items, (value) => {
-    //       return {name: value.name, label: value.name};
-    //     })
-    //   );
-    // });
+    fetch(url, {
+      method: 'GET',
+      headers: {
+        'Accept': 'text/plain',
+        'Authorization': 'Bearer ' + token
+      },
+    }).then((result) => {
+      if (result.status === 200) {
+        return result.clone().json()
+      }
+    }).then((result) => {
+      setAllRegion(
+        _.map(result.items, (value) => {
+          return {value: value.name, label: value.name};
+        })
+      );
+    });
 
   };
 

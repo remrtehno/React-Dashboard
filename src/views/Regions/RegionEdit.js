@@ -1,7 +1,7 @@
 import React, {useEffect, useState} from 'react';
 import HOST_URL from "../../constants";
 import {Col, Row, Input, Button, Table, CardBody} from "reactstrap";
-import Select from 'react-select'
+import Select from 'react-select';
 import _ from 'lodash';
 
 const RegionEdit = (props) => {
@@ -10,54 +10,54 @@ const RegionEdit = (props) => {
   const [allRegion, setAllRegion] = useState({});
 
   const loadRegion = () => {
-    const token = localStorage.getItem('access_token');
-    fetch(HOST_URL +`/api/regions/${regionId}`, {
-      method: 'GET',
-      headers: {
-        'Accept': 'text/plain',
-        'Authorization': 'Bearer ' + token
-      },
-    }).then((result) => {
-      if (result.status === 200) {
-        return result.clone().json()
-      }
-    }).then((result) => {
-      console.log(result);
-      //setRegion(result);
-    });
+    // const token = localStorage.getItem('access_token');
+    // fetch(HOST_URL +`/api/regions/${regionId}`, {
+    //   method: 'GET',
+    //   headers: {
+    //     'Accept': 'text/plain',
+    //     'Authorization': 'Bearer ' + token
+    //   },
+    // }).then((result) => {
+    //   if (result.status === 200) {
+    //     return result.clone().json()
+    //   }
+    // }).then((result) => {
+    //   setRegion(result);
+    // });
   };
 
-  const getAllRegions = () => {
+  const getAllRegions = (query = "") => {
+    if(query === " " || !query) return;
+
     const token = localStorage.getItem('access_token');
-    fetch(HOST_URL +`/api/yandex-direct/regions`, {
-      method: 'GET',
-      headers: {
-        'Accept': 'text/plain',
-        'Authorization': 'Bearer ' + token
-      },
-    }).then((result) => {
-      if (result.status === 200) {
-        return result.clone().json()
-      }
-    }).then((result) => {
-      setAllRegion(
-        _.map(result.items, (value) => {
-          return {name: value.name, label: value.name};
-        })
-      );
-    });
+    let url = new URL(HOST_URL +`/api/yandex-direct/regions`);
+    let params = {search: query};
+    Object.keys(params).forEach(key => url.searchParams.append(key, params[key]));
+
+    // fetch(url, {
+    //   method: 'GET',
+    //   headers: {
+    //     'Accept': 'text/plain',
+    //     'Authorization': 'Bearer ' + token
+    //   },
+    // }).then((result) => {
+    //   if (result.status === 200) {
+    //     return result.clone().json()
+    //   }
+    // }).then((result) => {
+    //   setAllRegion(
+    //     _.map(result.items, (value) => {
+    //       return {name: value.name, label: value.name};
+    //     })
+    //   );
+    // });
+
   };
 
   useEffect(() => {
     loadRegion(regionId);
     getAllRegions();
   }, []);
-
-  console.log(window.p = region);
-  console.log(window.pa = allRegion);
-  console.log(window._ = _);
-
-
 
   return (
     <div className="animated fadeIn">
@@ -91,7 +91,13 @@ const RegionEdit = (props) => {
           </div>
         </Col>
         <Col lg="6" className="mb-4">
-          <Select options={allRegion} />
+          <Select
+            isMulti
+            closeMenuOnSelect={false}
+            options={allRegion}
+            onInputChange={ (value) => { getAllRegions(value) } }
+            onChange={ (value) => {  } }
+          />
         </Col>
         <Col lg="6" className="mb-4">
           <Button onClick={()=> {}}  color="primary">Сохранить</Button>

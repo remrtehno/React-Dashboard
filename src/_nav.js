@@ -39,5 +39,10 @@ export default {
       url: '/regions',
       icon: 'icon-settings',
     },
+    {
+      name: 'Вакансии',
+      url: '/vacancies',
+      icon: 'icon-settings',
+    },
   ],
 };

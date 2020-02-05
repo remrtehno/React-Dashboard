@@ -41,6 +41,7 @@ const TablesMd = React.lazy(() => import('./views/Tables'));
 const Reports = React.lazy(() => import('./views/Reports'));
 const Regions = React.lazy(() => import('./views/Regions'));
 const RegionEdit = React.lazy(() => import('./views/Regions/RegionEdit'));
+const Vacancies = React.lazy(() => import('./views/Vacancies/'));
 
 
 // https://github.com/ReactTraining/react-router/tree/master/packages/react-router-config
@@ -92,6 +93,7 @@ const routes = [
   { path: '/reports', exact: true, name: 'Скачать в Excel', component: Reports },
   { path: '/regions', exact: true, name: 'Регионы', component: Regions },
   { path: '/regions/edit/:id', exact: true, name: 'Редактировать Регион', component: RegionEdit },
+  { path: '/vacancies', exact: true, name: 'Вакансии', component: Vacancies },
 ];
 
 export default routes;

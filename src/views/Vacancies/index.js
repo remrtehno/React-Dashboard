@@ -6,7 +6,7 @@ import Select from 'react-select'
 
 import useAllRegions from '../Regions/useRegionsApi';
 import useProfilesApi from "../Profiles/useProfilesApi";
-import usePostVacancies, {useVacanciesApi} from "./useVacanciesApi";
+import usePostVacancies, {useVacanciesApi, deleteVacancyApi} from "./useVacanciesApi";
 import {Link} from "react-router-dom";
 
 const Component = () => {
@@ -128,6 +128,7 @@ const Component = () => {
   const [sendVacancy] = usePostVacancies();
 
   const [getAllVacancies, load] = useVacanciesApi();
+  const [deleteVacancy] = deleteVacancyApi();
 
 
   return (
@@ -226,10 +227,10 @@ const Component = () => {
                       <td> </td>
                       <td>{`${value.status}`}</td>
                       <td>
-                          <Link to={`regions/edit/${value.id}`} block>
+                          <Link to={`regions/edit/${value.id}`} >
                             <Button block color="primary">Редактировать</Button>
                           </Link>
-                          <Button className="mt-3" onClick={ () => {} } block color="primary">Удалить</Button>
+                          <Button block className="mt-3" onClick={ () => deleteVacancy(value.id) } color="primary">Удалить</Button>
                       </td>
                     </tr>
                   )

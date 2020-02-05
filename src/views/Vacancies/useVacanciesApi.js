@@ -51,4 +51,22 @@ export function useVacanciesApi() {
   return [allVacancies, load];
 }
 
+export function deleteVacancyApi() {
+  const deleteVacancy = (id) => {
+    const token = localStorage.getItem('access_token');
+    fetch(HOST_URL + `/api/vacancy/${id}`, {
+      method: 'DELETE',
+      headers: {
+        'Accept': 'text/plain',
+        'Authorization': 'Bearer ' + token
+      },
+    }).then((result) => {
+      if (result.status === 200) {
+        alert('ok');
+      }
+    });
+  };
+  return [deleteVacancy];
+}
+
 export default usePostVacancies;

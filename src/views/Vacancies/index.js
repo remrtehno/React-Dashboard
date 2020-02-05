@@ -6,7 +6,8 @@ import Select from 'react-select'
 
 import useAllRegions from '../Regions/useRegionsApi';
 import useProfilesApi from "../Profiles/useProfilesApi";
-import usePostVacancies from "./useVacanciesApi";
+import usePostVacancies, {useVacanciesApi} from "./useVacanciesApi";
+import {Link} from "react-router-dom";
 
 const Component = () => {
 
@@ -126,6 +127,8 @@ const Component = () => {
 
   const [sendVacancy] = usePostVacancies();
 
+  const [getAllVacancies, load] = useVacanciesApi();
+
 
   return (
     <div className="animated fadeIn">
@@ -191,7 +194,51 @@ const Component = () => {
             </ModalBody>
           </Modal>
         </Col>
-        <Col lg="6" className="mb-3"> <Button onClick={ () => sendVacancy(vacancy) } className="mr-1">Отправить</Button> </Col>
+        <Col lg="6" className="mb-5"> <Button onClick={ () => sendVacancy(vacancy) } className="mr-1">Отправить</Button> </Col>
+        <Col lg="12" className="mb-3">
+          <h2> Просмотреть вакансии </h2>
+          <Button onClick={ () => load() } className="mr-1 mb-3">Загрузить список</Button>
+          <CardBody className="p-0">
+            <Table responsive striped hover>
+              <tbody>
+              <tr>
+                <td> Название </td>
+                <td> Регион </td>
+                <td> Профиль </td>
+                <td> Зарплата </td>
+                <td> Места </td>
+                <td> Внешние ID </td>
+                <td> Статус </td>
+                <td> Действия </td>
+              </tr>
+              {
+                _.map(getAllVacancies, (value, key) => {
+                  return (
+                    <tr key={key}>
+                      <td>{`${value.name}`}</td>
+                      <td>{`${value.region.name}`}</td>
+                      <td>{`${value.profile.name}`}</td>
+                      <td>
+                        От: {`${value.salary.from}`}{`${value.salary.currency}`} <br/>
+                        До: {`${value.salary.from}`}{`${value.salary.currency}`}
+                      </td>
+                      <td>{`${value.openPositions}`}</td>
+                      <td> </td>
+                      <td>{`${value.status}`}</td>
+                      <td>
+                          <Link to={`regions/edit/${value.id}`} block>
+                            <Button block color="primary">Редактировать</Button>
+                          </Link>
+                          <Button className="mt-3" onClick={ () => {} } block color="primary">Удалить</Button>
+                      </td>
+                    </tr>
+                  )
+                })
+              }
+              </tbody>
+            </Table>
+          </CardBody>
+        </Col>
       </Row>
     </div>
   );

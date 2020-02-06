@@ -6,7 +6,6 @@ import useAllRegions from "../Regions/useRegionsApi";
 function usePostVacancies() {
   const sendVacancy = (query = '') => {
     if(query === " " || !query) return;
-    console.log(JSON.stringify(query));
     const token = localStorage.getItem('access_token');
     fetch(HOST_URL +`/api/vacancy`, {
       method: 'POST',
@@ -17,11 +16,12 @@ function usePostVacancies() {
       },
       body: JSON.stringify(query),
     }).then((result) => {
+      if(result.status === 500) alert(result.status); return result.status;
       if (result.status === 200) {
         return result.clone().json()
       }
     }).then((result) => {
-      console.log(result);
+      alert('Вакансия создана');
       window.location.reload();
     });
   };
@@ -44,7 +44,6 @@ export function useVacanciesApi() {
         return result.clone().json()
       }
     }).then((result) => {
-      console.log(result);
       setAllVacancies(result.items);
     });
   };
@@ -61,8 +60,10 @@ export function deleteVacancyApi() {
         'Authorization': 'Bearer ' + token
       },
     }).then((result) => {
+      if(result.status === 500) return result.status;
       if (result.status === 200) {
-        alert('ok');
+        alert('Вакансия удалена');
+        window.location.reload();
       }
     });
   };

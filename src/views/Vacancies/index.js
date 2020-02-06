@@ -4,14 +4,14 @@ import {Col, Row, Input, Button, Table, CardBody, Modal, ModalHeader, ModalBody,
 import _ from 'lodash';
 import Select from 'react-select'
 
-import useAllRegions from '../Regions/useRegionsApi';
+import {useLocalRegions} from '../Regions/useRegionsApi';
 import useProfilesApi from "../Profiles/useProfilesApi";
 import usePostVacancies, {useVacanciesApi, deleteVacancyApi} from "./useVacanciesApi";
 import {Link} from "react-router-dom";
 
 const Component = () => {
 
-  const [allRegion, searchField, loadRegions] = useAllRegions();
+  const [allRegion, searchField, loadRegionsAll] = useLocalRegions();
   const [profiles, loadProfiles, allProfiles] = useProfilesApi();
   const [modal, setModal] = useState({modal: false});
   const [prices, setPrices] = useState({currency: 'Rub', from: '0', to: '0'});
@@ -43,9 +43,10 @@ const Component = () => {
 
   useEffect(() => {
     loadProfiles();
+    loadRegionsAll();
   }, []);
 
-  console.log(allRegion);
+  console.log(searchField);
 
   const selectRegion = (selected) => {
     _.forEach(allRegion, ({name, id}) => {
@@ -140,7 +141,6 @@ const Component = () => {
           <Select
             closeMenuOnSelect={true}
             options={ searchField }
-            onInputChange={ (value) => { loadRegions(value) } }
             onChange={ (value) => { selectRegion(value) } } />
         </Col>
         <Col lg="6" className="mb-3">
@@ -205,7 +205,7 @@ const Component = () => {
               <tr>
                 <td> Название </td>
                 <td> Регион </td>
-                <td> Профиль </td>
+                <td width="150"> Профиль </td>
                 <td> Зарплата </td>
                 <td> Места </td>
                 <td> Внешние ID </td>
@@ -217,14 +217,16 @@ const Component = () => {
                   return (
                     <tr key={key}>
                       <td>{`${value.name}`}</td>
-                      <td>{`${value.region.name}`}</td>
+                      <td width="150">{`${value.region.name}`}</td>
                       <td>{`${value.profile.name}`}</td>
                       <td>
                         От: {`${value.salary.from}`}{`${value.salary.currency}`} <br/>
-                        До: {`${value.salary.from}`}{`${value.salary.currency}`}
+                        До: {`${value.salary.to}`}{`${value.salary.currency}`}
                       </td>
                       <td>{`${value.openPositions}`}</td>
-                      <td> </td>
+                      <td> {
+                        value.externalIds.map(system => <div>{system.system}</div>)
+                      } </td>
                       <td>{`${value.status}`}</td>
                       <td>
                           <Link to={`regions/edit/${value.id}`} >

@@ -111,45 +111,37 @@ const Reports = () => {
     });
   }
 
-  useEffect(() => {
-    getRegions();
-  }, []);
-
   return (
     <div className="animated fadeIn">
       <Row>
-        <Col lg="12" className="mb-sm-5 mb-5">
-          <h2 className="mb-4"> Список регионов </h2>
-          <CardBody className="p-0">
-            <Table responsive striped hover>
-              <tbody>
-              <tr>
-                <td> Город </td>
-                <td> Регион </td>
-                <td className="text-right"></td>
-              </tr>
-              {
-                _.map(loadRegions.items, (value, key) => {
-                  return (
-                    <tr key={key}>
-                      <td>{`${value.name}`}</td>
-                      <td  width="240">
-                        { value.yandexRegions.map( regions => {
-                          return regions.name + ', ';
-                        }) }
-                      </td>
-                      <td className="text-right">
-                          <Link to={`/region/${value.id}`}>
-                            <Button color="primary">Подробнее</Button>
-                          </Link>
-                      </td>
-                    </tr>
-                  )
-                })
-              }
-              </tbody>
-            </Table>
-          </CardBody>
+        <Col lg="12" className="mb-4">
+          <h2> Сохранить в базу </h2>
+        </Col>
+        <Col lg="6" className="mb-3">
+          <h5> Название </h5>
+          <Input onChange={ (event) => { saveToBd.name = event.target.value } } />
+        </Col>
+        <Col lg="6" className="mb-3">
+          <h5> Дательный падеж (где) </h5>
+          <Input onChange={ (event) => { saveToBd.nameDative = event.target.value } } />
+        </Col>
+        <Col lg="6" className="mb-3">
+          <h5> Utm </h5>
+          <Input onChange={ (event) => { saveToBd.utm = event.target.value } } />
+        </Col>
+        <Col lg="12" className="mb-0">
+          <h5> Регионы для Яндекс.Директа </h5>
+        </Col>
+        <Col lg="6" className="mb-4">
+          <Select
+            isMulti
+            closeMenuOnSelect={false}
+            options={searchField}
+            onInputChange={ (value) => { getAllRegions(value) } }
+            onChange={ (value) => { setSelectRegion(value) } } />
+        </Col>
+        <Col lg="12" className="mb-3">
+          <Button onClick={ () => saveToBDAPI() }  color="primary">Сохранить</Button>
         </Col>
       </Row>
     </div>

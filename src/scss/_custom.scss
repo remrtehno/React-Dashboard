@@ -11,3 +11,20 @@
     opacity: 0.8;
   }
 }
+.table {
+  tr {
+    background: #ffffff;
+  }
+  &.tr-text-right td{
+    text-align: right;
+  }
+}
+.nav-dropdown-items {
+  .nav-link {
+    padding-left: 2rem;
+    font-size: 90%;
+    .nav-icon {
+      font-size: inherit;
+    }
+  }
+}

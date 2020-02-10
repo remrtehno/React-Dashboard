@@ -19,7 +19,7 @@ const Reports = () => {
       if(result.status === 500) return result.status;
       if (result.status === 200) {
        result.blob().then(function (text) {
-         downloadFile(text, 'report.xls');
+         downloadFile(text, 'report.xlsx');
         });
       }
     });

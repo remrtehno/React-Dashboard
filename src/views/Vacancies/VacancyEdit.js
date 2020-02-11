@@ -1,11 +1,9 @@
 import React, {useEffect, useState} from 'react';
-import HOST_URL from "../../constants";
-import {Col, Row, Input, Button, Table, CardBody, Modal, ModalHeader, ModalBody, ModalFooter} from "reactstrap";
+import {Col, Row, Input, Button, Modal, ModalBody} from "reactstrap";
 import _ from 'lodash';
 import Select from 'react-select'
 
 import {useVacancyApi, useVacancyPutApi} from "./useVacanciesApi";
-
 
 const Component = (props) => {
   const vacancyId = props.match.params.id;
@@ -18,11 +16,9 @@ const Component = (props) => {
     setModal({modal: !modal.modal, });
   };
 
-
   useEffect(() => {
     load(vacancyId);
   }, []);
-
 
   const editVacancy = (value, key, key2 = null) => {
     setVacancy((oldArray) => {
@@ -37,19 +33,8 @@ const Component = (props) => {
     });
   };
 
-  // const editVacancyIds = (externalIdsFilter) => {
-  //   const externalIds = _.map(externalIdsFilter, ({value, id}) => {
-  //     return {system: value, id: id};
-  //   });
-  //   setVacancy({...vacancy, 'externalIds': externalIds });
-  // };
-
   const addExternarIds = (value, key) => {
-    setExternalIds( (oldArray) => {
-      let obj = Object.assign({}, oldArray);
-      obj[key] = value;
-      return obj;
-    });
+    setExternalIds({...externalIds, [key]: value });
   };
 
   const addToVacancy = (value, key) => {
@@ -63,33 +48,15 @@ const Component = (props) => {
 
   const exIds = () => {
     const [{externalIds}] = vacancy;
-    let output;
-    output = externalIds.map( field => {
-      return { name: field.system, label: field.system }
+    return externalIds.map( field => {
+      return { value: field.id, label: field.system, id: field.id }
     });
-    return output;
   };
-
-
-  window._ = _;
-  console.log(
-    window.p = vacancy
-    ,
-    _.map(vacancy, ({externalIds}) => {
-      return _.map(externalIds, ({system, id}) => {
-        return {value: system, label: system, id: id, };
-      });
-    })
-
-
-  );
-
-
 
   return (
     <div className="animated fadeIn">
       <Row>
-        <Col lg="12" className="mb-3">  <h2> Редактировать вакансию </h2> </Col>
+        <Col lg="12" className="mb-3"> <h2> Редактировать вакансию </h2> </Col>
         <Col lg="12" className="mb-3">
           Название
           <Input type="text" onChange={(event) => { editVacancy(event.target.value, 'name', null) } } value={vacancy.map( field => field.name )} />
@@ -113,7 +80,6 @@ const Component = (props) => {
         <Col lg="2" className="mb-3">
           Валюта
           <Select
-            className="mb-3"
             value={ { value: vacancy.map( field => field.salary.currency), label: vacancy.map( field => field.salary.currency) }}
             closeMenuOnSelect={true}
             options={ [{value: 'rub', label: 'rub'}, {value: '$', label: '$'}] }
@@ -125,14 +91,18 @@ const Component = (props) => {
         </Col>
         <Col lg="12" className="mb-3">
           Внешние ID
+          <div className="d-sm-flex">
           <Select
-            className="mb-3"
-            value={ exIds() }
+            className="flex-grow-1 mb-3 mb-sm-0"
+            value={  exIds() }
             options={ exIds() }
             isMulti
             closeMenuOnSelect={true}
-            onChange={ (value) => { console.log(value) } } />
-          <Button disabled={_.isEmpty('externalIds')} onClick={ () => { toggle(); }} className="mr-1">Добавить</Button>
+            onChange={(value) => {
+              editVacancy( _.map(value, ({label, id}) => { return { system: label, id: id, } }), 'externalIds' )
+            }} />
+          <Button disabled={_.isEmpty('externalIds')} onClick={ () => { toggle(); }} className="ml-sm-3 align-self-center">Добавить</Button>
+          </div>
           <Modal isOpen={modal.modal} toggle={toggle} >
             <ModalBody>
               <Input className="mb-3" type="text" onChange={(event) => { addExternarIds(event.target.value, 'id') } } placeholder={'ID'} />
@@ -142,7 +112,7 @@ const Component = (props) => {
                 closeMenuOnSelect={true}
                 options={ [{value: 'Skillaz', label: 'Skillaz'}, {value: 'SF', label: 'SF'}] }
                 onChange={ (value) => { addExternarIds(value.value, 'system')} } />
-              <Button disabled={_.isEmpty('externalIds')} onClick={ () => { addToVacancy(externalIds, 'externalIds');  toggle(); }} className="mr-1">Добавить</Button>
+              <Button disabled={_.isEmpty(externalIds)} onClick={ () => { addToVacancy(externalIds, 'externalIds');  toggle(); }} className="mr-1">Добавить</Button>
             </ModalBody>
           </Modal>
         </Col>

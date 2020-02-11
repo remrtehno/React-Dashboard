@@ -69,10 +69,6 @@ export function useVacancyApi() {
       },
       "openPositions": 0,
       "externalIds": [
-        {
-          "id": "string",
-          "system": "Undefined"
-        }
       ],
       "status": "Active",
       "id": "string"

@@ -2,8 +2,10 @@ import React, {useEffect, useState} from 'react';
 import HOST_URL from "../../constants";
 import {Col, Row} from "reactstrap";
 import {downloadFile} from "../../utils/downloadFile";
+import useUploadState from "../../api/useUploadState";
 
 const Reports = () => {
+  const [loadApi, uploadState] = useUploadState();
 
   const executeRequest = (e) => {
     e.preventDefault();
@@ -25,11 +27,15 @@ const Reports = () => {
     });
   };
 
+  useEffect( () => {
+    loadApi();
+  }, []);
+
   return (
     <div className="animated fadeIn">
       <Row>
         <Col lg="12" className="mb-sm-5 mb-5">
-          <h4 className="mb-5 font-weight-light text-uppercase"> Обновлено: 29.01.2020 19:47 </h4>
+          <h4 className="mb-5 font-weight-light text-uppercase"> Обновлено: {uploadState} </h4>
           <h4 className="mb-4 text-uppercase">Подробный отчет по всем партнерам</h4>
           <a href="#" className="btn-download" onClick={executeRequest}> Скачать </a>
           <div className="mb-sm-5 mb-5"> </div>

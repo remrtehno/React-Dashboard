@@ -14,8 +14,6 @@ const Component = (props) => {
     loadApi(vacancyId);
   }, []);
 
-  console.log(region);
-
   return (
     <div className="animated fadeIn">
       <Row>
@@ -38,7 +36,7 @@ const Component = (props) => {
               </tr>
               <tr>
                 <th> Регионы для Яндекс.Директа: </th>
-                <td> { _.map(region.yandexRegions, ({name, id}) => { return name; }) } </td>
+                <td> { _.map(region.yandexRegions, ({name, id}) => { return name+', '; }) } </td>
               </tr>
               </tbody>
             </table>

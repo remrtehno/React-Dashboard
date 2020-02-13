@@ -4,7 +4,7 @@ import HOST_URL from "../../constants";
 import {Col, Row} from "reactstrap";
 import _ from 'lodash';
 import moment from "moment";
-
+import useUploadState from "../../api/useUploadState";
 
 const formCity = (array) => {
   return _.reduce(array, (partners, {items, city, totalCount}) => {
@@ -60,16 +60,16 @@ const returnSpecialFields = (array) => {
   });
     return row;
   }, [{
-  label: 'Названик',
-  field: 'sourceName',
-  sort: 'asc',
-  width: 150
-}]);
+        label: 'Названик',
+        field: 'sourceName',
+        sort: 'asc',
+        width: 150
+      }]);
 };
 
 const DatatablePage = () => {
-  const [dataTable, setDataTable] = useState({ topCity: null, utmWeekly: null, utmWeeklyCandidate: null, utmWeeklyDates: null, });
-
+  const [dataTable, setDataTable] = useState({ });
+  const [loadApi, uploadState] = useUploadState();
   const loadTables = () => {
     let token = localStorage.getItem('access_token');
     fetch(HOST_URL +'/api/skillaz-candidates/report', {
@@ -89,7 +89,8 @@ const DatatablePage = () => {
   };
 
   useEffect( () => {
-    loadTables();
+   loadTables();
+    loadApi();
   }, []);
 
   const data = {
@@ -146,7 +147,7 @@ const DatatablePage = () => {
     <div className="animated fadeIn">
       <Row>
         <Col lg="12" className="mb-sm-5 mb-5">
-          <h4 className="mb-5 font-weight-light text-uppercase"> Обновлено: 29.01.2020 19:47 </h4>
+          <h4 className="mb-5 font-weight-light text-uppercase"> Обновлено: {uploadState} </h4>
           <h4 className="mb-4 text-center">Города с самым большим числом Интервью за период</h4>
           <MDBDataTable
             striped

@@ -28,9 +28,8 @@ const Component = () => {
     filteredVacancy = fuse.search(fuseQuery);
   }
 
-
   const getFields = (field) => {
-    if(getAllVacancies.length === 0) return; 
+    if(getAllVacancies.length === 0) return []; 
     return getAllVacancies.reduce( (result, object) => {
       (Array.isArray(result) || (result = []));
       if(result.find( name => name.value === object[field].name)) return result;
@@ -38,10 +37,6 @@ const Component = () => {
       return result; 
     });
   };
-
-  //console.log(window.p = filteredVacancy, window._ = _);
-  
-
 
   return (
     <div className="animated fadeIn">
@@ -66,43 +61,55 @@ const Component = () => {
               <Select
                     placeholder={"Статус"}
                     closeMenuOnSelect={true}
-                    options={ [{value: 'active', label: 'Активные'}, {value: 'stopped', label: 'Неактивные'}] } 
+                    options={ [{value: 'active', label: 'Активные'}, {value: 'stopped', label: 'Неактивные'}, {value: null, label: 'Все'}] } 
                     onChange={ 
                       (value) => { 
                         setFilters( (filters) => {
-                          return {...filters, status: value.value};
+                          if(value.value) {
+                            return {...filters, status: value.value};
+                          } else {
+                            delete filters.status;
+                            return {...filters};
+                          }
                         }); 
                       } 
-                    }
-                    />
+                    }/>
             </Col>
             <Col lg="2">
               <Select
                   placeholder={"Регион"}
                   closeMenuOnSelect={true}
-                  options={ getFields('region') } 
+                  options={ [...getFields('region'), {value: null, label: 'Все'} ] } 
                   onChange={ 
                     (value) => { 
                       setFilters( (filters) => {
-                        return {...filters, region: {name: value.value}};
+                        if(value.value) {
+                          return {...filters, region: {name: value.value}};
+                        } else {
+                          delete filters.region;
+                          return {...filters};
+                        }
                       }); 
                     } 
-                  }
-                  />
+                  }/>
             </Col>
             <Col lg="2">
               <Select
                 placeholder={"Профиль"}
                 closeMenuOnSelect={true}
-                options={ getFields('profile') } 
+                options={ [ ...getFields('profile'), {value: null, label: 'Все'}] } 
                 onChange={ 
                   (value) => { 
                     setFilters( (filters) => {
-                      return {...filters, profile: {name: value.value}};
+                      if(value.value) {
+                        return {...filters, profile: {name: value.value}};
+                      } else {
+                        delete filters.profile;
+                        return {...filters};
+                      }
                     }); 
                   } 
-                }
-               />
+                }/>
             </Col>
             <Col lg="1">
               <Button onClick={toggle}> Добавить </Button>

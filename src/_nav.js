@@ -90,5 +90,10 @@ export default {
         },
       ]
     },
+    {
+      name: 'Yandex direct',
+      url: '/yandex_direct',
+      icon: 'icon-settings',
+    },
   ],
 };

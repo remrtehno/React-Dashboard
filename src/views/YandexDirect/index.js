@@ -1,5 +1,5 @@
 import React, {useEffect, useState} from 'react';
-import { Table, Row, Col, Container, Button } from 'reactstrap';
+import { Table, Row, Col, Container, Button, Input, Label } from 'reactstrap';
 import { useCompaniesApi } from "./useYandexDirectApi";
 import Select from 'react-select';
 
@@ -223,6 +223,24 @@ const Component = () => {
             closeMenuOnSelect={true}
             options={calcOptions(getAllCompanies, 'profiles')}
             onChange={ (selected) => setFilters({...filters, profile: selected.value}) } />
+        </Col>
+        <Col>
+          <Label>
+            Начало периода
+            <Input
+              type="date"
+              name="date"
+            />
+          </Label>
+        </Col>
+        <Col>
+          <Label>
+            Конец периода
+            <Input
+              type="date"
+              name="date"
+            />
+          </Label>
         </Col>
       </Row>
       <Table style={{borderCollapse: 'unset'}}>

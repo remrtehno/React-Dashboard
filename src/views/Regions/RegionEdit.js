@@ -1,13 +1,16 @@
 import React, {useEffect, useState} from 'react';
 import HOST_URL from "../../constants";
-import {Col, Row, Input, Button, Table, CardBody} from "reactstrap";
+import {Col, Row, Input, Button, Table} from "reactstrap";
 import Select from 'react-select';
 import _ from 'lodash';
+
+import {usePutRegion} from './useRegionsApi';
 
 const RegionEdit = (props) => {
   const regionId = props.match.params.id;
   const [region, setRegion] = useState({});
   const [allRegion, setAllRegion] = useState([]);
+  const [apiLoad] = usePutRegion();
 
   const loadRegion = () => {
     const token = localStorage.getItem('access_token');
@@ -47,7 +50,7 @@ const RegionEdit = (props) => {
     }).then((result) => {
       setAllRegion(
         _.map(result.items, (value) => {
-          return {value: value.name, label: value.name};
+          return {value: value.name, label: value.name, id: value.id, };
         })
       );
     });
@@ -59,49 +62,66 @@ const RegionEdit = (props) => {
     getAllRegions();
   }, []);
 
+
+  const edit = (value, key, key2 = null) => {
+    setRegion((oldArray) => {
+        if(key2) {
+          let obj = _.cloneDeep(oldArray);
+          obj[key][key2] = value;
+          return obj;
+        }
+        let obj =_.cloneDeep(oldArray);
+        obj[key] = value;
+        return obj;
+    });
+  };
+
+  const editSelect = (regionFilter) => {
+    const yandexRegions = _.map(regionFilter, ({value, id}) => {
+     return {name: value, id: id};
+    });
+    setRegion({...region, 'yandexRegions': yandexRegions });
+  };
+
+
   return (
     <div className="animated fadeIn">
       <Row>
         <Col lg="12" className="mb-0">
           <h2 className="mb-3"> Редактировать регион</h2>
-          <Table responsive striped hover className="mb-5">
+          <Table responsive striped hover className="mb-3">
             <tbody>
               <tr>
-                <td>name:</td>
-                <td><Input type="text" autoComplete="username" placeholder={region.name}  /></td>
+                <td>Название:</td>
+                <td><Input onChange={(event) => { edit(event.target.value, 'name', null) } } value={region.name}  /></td>
               </tr>
               <tr>
-                <td>nameDative:</td>
-                <td> <Input type="text" autoComplete="username" placeholder={region.nameDative} /> </td>
+                <td>Дательный падеж (где):</td>
+                <td> <Input onChange={(event) => { edit(event.target.value, 'nameDative', null) } } value={region.nameDative} /> </td>
               </tr>
               <tr>
-                <td>utm:</td>
-                <td><Input type="text" autoComplete="username" placeholder={region.utm}  /></td>
+                <td>Utm:</td>
+                <td><Input onChange={(event) => { edit(event.target.value, 'utm', null) } } value={region.utm}  /></td>
               </tr>
             </tbody>
           </Table>
-          <div className="mb-2">
-          {
-            _.map(region.yandexRegions, ({name}) => {
-              return (
-                <span>{name}, </span>
-              );
-            })
-          }
-          </div>
         </Col>
         <Col lg="6" className="mb-4">
+          <h5 className="mb-3"> Регионы для Яндекс.Директа: </h5>
           <Select
+            className="mb-3"
+            value={
+              _.map(region.yandexRegions, ({name, id}) => { return  {value: name, label: name, id: id, }; })
+            }
             isMulti
             closeMenuOnSelect={false}
             options={allRegion}
             onInputChange={ (value) => { getAllRegions(value) } }
-            onChange={ (value) => {  } }
+            onChange={ (value) => { editSelect(value) }}
           />
+          <Button onClick={()=> apiLoad(regionId, region) }  color="primary">Сохранить</Button>
         </Col>
-        <Col lg="6" className="mb-4">
-          <Button onClick={()=> {}}  color="primary">Сохранить</Button>
-        </Col>
+
       </Row>
     </div>
   );

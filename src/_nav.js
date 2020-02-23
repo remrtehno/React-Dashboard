@@ -30,19 +30,65 @@ export default {
       icon: 'icon-pie-chart',
     },
     {
-      name: 'Пользователи',
-      url: '/users',
-      icon: 'icon-settings',
-    },
-    {
       name: 'Регионы',
-      url: '/regions',
+      url: '/#',
       icon: 'icon-settings',
+      children: [
+        {
+          name: 'Просмотреть',
+          url: '/regions',
+          icon: 'icon-puzzle',
+        },
+        {
+          name: 'Добавить',
+          url: '/regions/create',
+          icon: 'icon-puzzle',
+        },
+        {
+          name: 'Редактировать',
+          url: '/regions/edit-page/',
+          icon: 'icon-puzzle',
+        }
+      ]
     },
     {
       name: 'Вакансии',
-      url: '/vacancies',
+      url: '#',
       icon: 'icon-settings',
+      children: [
+        {
+          name: 'Просмотреть',
+          url: '/vacancies',
+          icon: 'icon-puzzle',
+        },
+        {
+          name: 'Добавить',
+          url: '/vacancies/create',
+          icon: 'icon-puzzle',
+        },
+        {
+          name: 'Редактировать',
+          url: '/vacancies/edit',
+          icon: 'icon-puzzle',
+        }
+      ]
+    },
+    {
+      name: 'Пользователи',
+      url: '/users',
+      icon: 'icon-settings',
+      children: [
+        {
+          name: 'Все пользователи',
+          url: '/users',
+          icon: 'icon-puzzle',
+        },
+        {
+          name: 'Добавить',
+          url: '/user/create/',
+          icon: 'icon-puzzle',
+        },
+      ]
     },
   ],
 };

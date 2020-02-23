@@ -2,7 +2,6 @@ import React, { useEffect, useState } from 'react';
 import HOST_URL from '../../constants';
 import * as moment from 'moment';
 import _ from 'lodash';
-
 import {
   Col,
   Row,
@@ -10,6 +9,8 @@ import {
 import { AreaChart, Area,Brush,
   ResponsiveContainer, BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, Legend,
 } from 'recharts';
+
+import useUploadState from "../../api/useUploadState";
 
 const formData = (data, fieldSelect) => {
   const result = _.reduce(data, function(points, { fields, partnerName }) {
@@ -55,6 +56,7 @@ function CustomizedAxisTick(props) {
 }
 
 function Dashboard() {
+  const [loadApi, uploadState] = useUploadState();
   const [dataCharts, setDataCharts] = useState({ monthly: null, monthlyInterview: null, weekly: null, weeklyInterview: null, });
   const loadCharts = () => {
     let token = localStorage.getItem('access_token');
@@ -74,15 +76,20 @@ function Dashboard() {
     });
   };
 
+
+
   useEffect( () => {
+    loadApi();
+
     loadCharts();
+
   }, []);
 
   return (
     <div className="animated fadeIn">
       <Row>
         <Col lg="12" className="mb-sm-5 mb-5">
-          <h4 className="mb-5 font-weight-light text-uppercase"> Обновлено: 29.01.2020 19:47 </h4>
+          <h4 className="mb-5 font-weight-light text-uppercase"> Обновлено: {uploadState} </h4>
           <h4 className="mb-4 text-center">Динамика по пройденным Интервью</h4>
           <div style={{ width: '100%', height: '300px'}} className="mb-5">
             <ResponsiveContainer>

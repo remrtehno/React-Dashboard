@@ -13,8 +13,6 @@ const Component = (props) => {
     load();
   }, []);
 
-  console.log(getAllVacancies);
-
   return (
     <div className="animated fadeIn">
       <Row>

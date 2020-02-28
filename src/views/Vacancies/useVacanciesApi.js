@@ -33,7 +33,7 @@ export function useVacanciesApi() {
 
   const load = () => {
     const token = localStorage.getItem('access_token');
-    fetch(HOST_URL + `/api/vacancy`, {
+    fetch(HOST_URL + `/api/vacancies`, {
       method: 'GET',
       headers: {
         'Accept': 'text/plain',
@@ -47,7 +47,7 @@ export function useVacanciesApi() {
       setAllVacancies(result.items);
     });
   };
-  return [allVacancies, load];
+  return [allVacancies, load, setAllVacancies];
 }
 
 export function useVacancyApi() {
@@ -77,7 +77,7 @@ export function useVacancyApi() {
 
   const load = (vacancyId) => {
     const token = localStorage.getItem('access_token');
-    fetch(HOST_URL + `/api/vacancy`, {
+    fetch(HOST_URL + `/api/vacancies`, {
       method: 'GET',
       headers: {
         'Accept': 'text/plain',
@@ -97,7 +97,7 @@ export function useVacancyApi() {
 export function useVacancyPutApi() {
   const loadPut = (vacancyId, data) => {
     const token = localStorage.getItem('access_token');
-    fetch(HOST_URL + `/api/vacancy/${vacancyId}`, {
+    fetch(HOST_URL + `/api/vacancies/${vacancyId}`, {
       method: 'PUT',
       headers: {
         'Accept': '*/*',

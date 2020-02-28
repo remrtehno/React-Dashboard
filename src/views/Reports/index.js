@@ -27,10 +27,6 @@ const Reports = () => {
   };
 
   const executeHoneySource = () => {
-    console.log(HOST_URL +'/api/skillaz-candidates/xls-report');
-
-
-    console.log(HOST_URL +'​/api/skillaz-candidates/utm-xls-report');
     let token = localStorage.getItem('access_token');
     fetch(HOST_URL +'/api/skillaz-candidates/utm-xls-report', {
       method: 'GET',
@@ -41,10 +37,10 @@ const Reports = () => {
     }).then((result) => {
       if(result.status === 500) return result.status;
       if (result.status === 200) {
-        console.log(result);
-        // result.blob().then(function (text) {
-        //   downloadFile(text, 'report.xlsx');
-        // });
+        let filename = result.headers.get('content-disposition');
+        result.blob().then(function (text) {
+          downloadFile(text, filename.match(/filename=(.*[\s\S]*);/)[1]);
+        });
       }
     });
   };

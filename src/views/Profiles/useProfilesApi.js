@@ -8,7 +8,7 @@ function useProfilesApi() {
 
   const loadProfiles = () => {
     const token = localStorage.getItem('access_token');
-    fetch(HOST_URL +`/api/profile`, {
+    fetch(HOST_URL +`/api/profiles`, {
       method: 'get',
       headers: {
         'Accept': 'text/plain',

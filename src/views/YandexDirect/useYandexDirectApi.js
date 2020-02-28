@@ -69,9 +69,6 @@ export function useProfilesApi() {
 export function useCardsApi() {
   const [allCards, setAllCards] = useState({});
 
-  const mockRegionId = "5e35ac6e1acb3417c8381c2c";
-  const mockProfileIds = ["5e35af60f7acdf352c83b500"];
-
   const loadCards = (regionId, profileIds) => {
     axios
       .get(HOST_URL + '/api/yandex-direct/creation-wizard/ad-text-templates',  {
@@ -79,7 +76,7 @@ export function useCardsApi() {
           'Accept': 'text/plain',
           'Authorization': 'Bearer ' + token
         },
-        params: { regionId: mockRegionId, profileIds: mockProfileIds + '' }
+        params: { regionId, profileIds: profileIds + '' }
       }).then((result) => {
       setAllCards(result.data);
     }).catch(err => {

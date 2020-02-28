@@ -139,7 +139,8 @@ const Component = ({setStep, selectedCity, selectedProfiles}) => {
   const [images, loadImage] = useImageByIdApi();
 
   useEffect(() => {
-    loadCards(selectedCity, selectedProfiles)
+    const selectedProfileIds = selectedProfiles.map(prof => prof.id);
+    loadCards(selectedCity.id, selectedProfileIds)
   }, []);
 
   if (allCards.templates && !templates.length) {

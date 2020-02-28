@@ -50,6 +50,7 @@ const VacancyEdit = React.lazy(() => import('./views/Vacancies/VacancyEdit'));
 const VacanciesCreate = React.lazy(() => import('./views/Vacancies/indexCreate'));
 const VacancyDetail = React.lazy(() => import('./views/Vacancies/VacancyDetail'));
 const YandexDirect = React.lazy(() => import('./views/YandexDirect'));
+const CreateCompany = React.lazy(() => import('./views/YandexDirect/createCompany/CreateCompany'));
 
 
 
@@ -110,7 +111,8 @@ const routes = [
   { path: '/vacancies/edit', exact: true, name: 'Вакансии', component: VacanciesEdit },
   { path: '/vacancy/edit/:id', exact: true, name: 'Вакансии', component: VacancyEdit },
   { path: '/vacancy/:id', exact: true, name: 'Вакансии', component: VacancyDetail },
-  { path: '/yandex_direct', exact: true, name: 'Yandex direct', component: YandexDirect },
+  { path: '/yandex-direct', exact: true, name: 'Yandex direct', component: YandexDirect },
+  { path: '/yandex-direct/create-company', exact: true, name: 'Create company', component: CreateCompany },
 ];
 
 export default routes;

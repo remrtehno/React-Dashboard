@@ -92,7 +92,7 @@ export default {
     },
     {
       name: 'Yandex direct',
-      url: '/yandex_direct',
+      url: '/yandex-direct',
       icon: 'icon-settings',
     },
   ],

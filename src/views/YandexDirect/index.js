@@ -1,6 +1,7 @@
 import React, {useEffect, useState} from 'react';
 import { Table, Row, Col, Container, Button, Input, Label } from 'reactstrap';
 import { useCompaniesApi } from "./useYandexDirectApi";
+import { Link } from 'react-router-dom';
 import Select from 'react-select';
 
 const mockHeaders = [
@@ -16,6 +17,9 @@ const mockHeaders = [
 const renderTableRows = (rows) => {
   if (rows.length > 0) {
     return rows.map(row => {
+      if (row.state === 'archived') {
+        return null
+      }
       const backgroundColor = row.state === 'on' ? 'bg-turquoise' : 'bg-secondary';
       const colClasses = `mr-1 ml-1 text-center align-middle ${backgroundColor}`;
 
@@ -29,7 +33,7 @@ const renderTableRows = (rows) => {
         case 'on':
           iconsClasses.active += ' text-black-50';
           break;
-        case 'stop':
+        case 'off':
           iconsClasses.stopped += ' text-black-50';
           break;
         case 'edit':
@@ -39,13 +43,13 @@ const renderTableRows = (rows) => {
           break
       }
 
-      let profiles = '';
+      let vacancies = '';
 
-      row.profiles.map((vacancy, index) => {
-        profiles += vacancy.name;
-        if (index < (row.profiles.length-1)) {
+      row.vacancies.map((vacancy, index) => {
+        vacancies += vacancy.name;
+        if (index < (row.vacancies.length-1)) {
 
-          profiles += ', '
+          vacancies += ', '
         }
       });
 
@@ -55,7 +59,7 @@ const renderTableRows = (rows) => {
             <h6>
               Yandex
             </h6>
-            <span className={'text-white'}>
+            <span className='text-white'>
             {row.state}
             </span>
             <div style={{minWidth: '90px'}}>
@@ -66,17 +70,17 @@ const renderTableRows = (rows) => {
           </td>
           <td className={colClasses}>
             <h6>
-              {row.region.name}
+              {row.region ? row.region.name : 'Город не выбран'}
             </h6>
             <p>
               <small>
-                {profiles}
+                {vacancies}
               </small>
             </p>
           </td>
           <td className={colClasses}>
             <div>
-              <u className={'d-block'}>
+              <u className='d-block'>
                 {row.weeklyBudget} &#8381;
               </u>
               <small>
@@ -84,7 +88,7 @@ const renderTableRows = (rows) => {
               </small>
             </div>
             <div>
-              <u className={'d-block'}>
+              <u className='d-block'>
                 {row.maxCPC} &#8381;
               </u>
               <small>
@@ -99,7 +103,7 @@ const renderTableRows = (rows) => {
             <div>
               {row.clicks}
             </div>
-            <div className={'border-top border-dark'}>
+            <div className='border-top border-dark'>
               {row.cpc}
             </div>
           </td>
@@ -107,7 +111,7 @@ const renderTableRows = (rows) => {
             <div>
               {row.candidates}
             </div>
-            <div className={'border-top border-dark'}>
+            <div className='border-top border-dark'>
               {row.cpl}
             </div>
           </td>
@@ -115,7 +119,7 @@ const renderTableRows = (rows) => {
             <div>
               {row.interviews}
             </div>
-            <div className={'border-top border-dark'}>
+            <div className='border-top border-dark'>
               {row.cpa}
             </div>
           </td>
@@ -126,7 +130,7 @@ const renderTableRows = (rows) => {
 
   return (
     <tr>
-      <td colSpan={7} className={'text-center bg-secondary'}>
+      <td colSpan={7} className='text-center bg-secondary'>
           No data...
       </td>
     </tr>
@@ -140,11 +144,13 @@ const calcOptions = (rows = [], type = null) => {
 
   if (type === 'regions') {
     rows.map(row => {
-      options[row.region.name] = row.region.name
+      if (row.region) {
+        options[row.region.name] = row.region.name
+      }
     });
   } else if (type === 'profiles') {
     rows.map(row => {
-      row.profiles.map(vacancy => options[vacancy.name] = vacancy.name)
+      row.vacancies.map(vacancy => options[vacancy.name] = vacancy.name)
     })
   } else {
     options = {
@@ -170,7 +176,7 @@ const filterCompanies = (rows, filters) => {
     filteredRows = filteredRows.filter(row => row.state === filters.company)
   }
   if (filters.region !== 'Все') {
-    filteredRows = filteredRows.filter(row => row.region.name === filters.region)
+    filteredRows = filteredRows.filter(row => row.region && row.region.name === filters.region)
   }
   if (filters.profile !== 'Все') {
     filteredRows = filteredRows.filter(row => row.profiles.find(vacancy => vacancy.name === filters.profile))
@@ -191,38 +197,46 @@ const Component = () => {
     load();
   }, []);
 
-  console.log(getAllCompanies)
-
   const filteredCompanies = filterCompanies(getAllCompanies, filters);
 
   return (
     <Container>
-      <Row className={'mb-3'}>
-        <Col className={'d-flex flex-row-reverse'}>
-          <Button className={'bg-turquoise-button text-white'}> Новая кампания + </Button>
+      <Row className='mb-3'>
+        <Col className='d-flex flex-row-reverse'>
+          <Link to='/yandex-direct/create-company'>
+            <Button className='bg-turquoise-button text-white'>
+              Новая кампания +
+            </Button>
+          </Link>
         </Col>
       </Row>
-      <Row className={'mb-3'}>
+      <Row className='mb-3'>
         <Col>
           Кампании
           <Select
             closeMenuOnSelect={true}
             options={calcOptions(getAllCompanies)}
-            onChange={ (selected) => setFilters({...filters, company: selected.value}) } />
+            onChange={ (selected) => setFilters({...filters, company: selected.value}) }
+            defaultValue={calcOptions(getAllCompanies)[0]}
+          />
         </Col>
         <Col>
           Города
           <Select
             closeMenuOnSelect={true}
             options={calcOptions(getAllCompanies, 'regions')}
-            onChange={ (selected) => setFilters({...filters, region: selected.value}) } />
+            onChange={ (selected) => setFilters({...filters, region: selected.value}) }
+            defaultValue={calcOptions(getAllCompanies, 'regions')[0]}
+          />
         </Col>
         <Col>
           Профили
           <Select
             closeMenuOnSelect={true}
             options={calcOptions(getAllCompanies, 'profiles')}
-            onChange={ (selected) => setFilters({...filters, profile: selected.value}) } />
+            onChange={ (selected) => setFilters({...filters, profile: selected.value}) }
+            defaultValue={calcOptions(getAllCompanies, 'profiles')[0]}
+          />
         </Col>
         <Col>
           <Label>
@@ -249,7 +263,7 @@ const Component = () => {
             {
               mockHeaders.map((header, index) => {
                 return (
-                  <th key={index} className={'bg-turquoise text-center'}>
+                  <th key={index} className='bg-turquoise text-center'>
                     {header}
                   </th>
                 )

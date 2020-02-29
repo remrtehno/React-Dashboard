@@ -28,8 +28,6 @@
     }
   }
 }
-
-
 .vacancy {
   display: inline-block;
   width: 100%;
@@ -52,4 +50,13 @@
   .vacancy-field {
     font-size: 15px;
   }
+}
+.bg-turquoise {
+  background-color: #77E8CA;
+}
+.bg-turquoise-button {
+  background: rgba(54, 156, 156, 1);
+}
+.border-2 {
+  border-width: 2px !important;
 }

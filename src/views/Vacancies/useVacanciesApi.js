@@ -1,13 +1,12 @@
 import HOST_URL from "../../constants";
 import _ from "lodash";
 import {useState} from "react";
-import useAllRegions from "../Regions/useRegionsApi";
 
 function usePostVacancies() {
   const sendVacancy = (query = '') => {
     if(query === " " || !query) return;
     const token = localStorage.getItem('access_token');
-    fetch(HOST_URL +`/api/vacancy`, {
+    fetch(HOST_URL +`/api/vacancies`, {
       method: 'POST',
       headers: {
         'Accept': 'text/plain',

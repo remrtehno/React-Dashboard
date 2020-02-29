@@ -31,7 +31,7 @@ export default {
     },
     {
       name: 'Регионы',
-      url: '/#',
+      url: '/regions',
       icon: 'icon-settings',
       children: [
         {
@@ -53,25 +53,8 @@ export default {
     },
     {
       name: 'Вакансии',
-      url: '#',
+      url: '/vacancies',
       icon: 'icon-settings',
-      children: [
-        {
-          name: 'Просмотреть',
-          url: '/vacancies',
-          icon: 'icon-puzzle',
-        },
-        {
-          name: 'Добавить',
-          url: '/vacancies/create',
-          icon: 'icon-puzzle',
-        },
-        {
-          name: 'Редактировать',
-          url: '/vacancies/edit',
-          icon: 'icon-puzzle',
-        }
-      ]
     },
     {
       name: 'Пользователи',

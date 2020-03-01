@@ -39,11 +39,13 @@ export function useVacanciesApi() {
         'Authorization': 'Bearer ' + token
       },
     }).then((result) => {
-      if (result.status === 200) {
-        return result.clone().json()
-      }
+      if (result.status === 200) return result.clone().json();
     }).then((result) => {
-      setAllVacancies(result.items);
+      try {
+        if(!_.isEmpty(result)) setAllVacancies(result.items);
+      } catch (e) {
+        console.log(e);
+      }
     });
   };
   return [allVacancies, load, setAllVacancies];

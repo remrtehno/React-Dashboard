@@ -57,6 +57,11 @@ export default {
       icon: 'icon-settings',
     },
     {
+      name: 'Профили',
+      url: '/profiles',
+      icon: 'icon-settings',
+    },
+    {
       name: 'Пользователи',
       url: '/users',
       icon: 'icon-settings',

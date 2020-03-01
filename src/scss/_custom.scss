@@ -60,3 +60,16 @@
 .border-2 {
   border-width: 2px !important;
 }
+.table-top-align-row {
+  tr {
+    vertical-align: top;
+  }
+}
+
+.vertical-scroll {
+  height: 300px;
+  overflow-y: scroll;
+  background: white;
+  padding: 10px;
+
+}

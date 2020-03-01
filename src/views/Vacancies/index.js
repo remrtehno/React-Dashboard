@@ -112,12 +112,9 @@ const Component = () => {
                 }/>
             </Col>
             <Col lg="1">
-              <Button onClick={toggle}> Добавить </Button>
-              <Modal isOpen={modal.modal} toggle={toggle} >
-                <ModalBody>
-                  
-                </ModalBody>
-              </Modal>
+              <Link to={`/vacancies/create`} >
+                <Button> Добавить </Button>
+              </Link>
             </Col>
           </Row>
             <hr color="black"/>

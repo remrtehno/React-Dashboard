@@ -124,8 +124,6 @@ const Component = () => {
 
   vacancy.salary = {"currency": prices.currency, from: prices.from, to: prices.to,};
 
-  console.log(vacancy);
-
   const [sendVacancy] = usePostVacancies();
 
   const [getAllVacancies, load] = useVacanciesApi();

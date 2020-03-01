@@ -27,5 +27,27 @@ function useProfilesApi() {
   return [profiles, loadProfiles, allProfiles];
 }
 
+export function useProfileApi() {
+  const [profile, setProfile] = useState([]);
+  const loadProfile = (id = 0) => {
+    if(!id) return;
+    const token = localStorage.getItem('access_token');
+    fetch(HOST_URL +`/api/profile/${id}`, {
+      method: 'get',
+      headers: {
+        'Accept': 'text/plain',
+        'Authorization': 'Bearer ' + token
+      },
+    }).then((result) => {
+      if (result.status === 200) {
+        return result.clone().json();
+      }
+    }).then((result) => {
+      setProfile(result);
+    });
+  };
+
+  return [profile, loadProfile];
+}
 
 export default useProfilesApi;

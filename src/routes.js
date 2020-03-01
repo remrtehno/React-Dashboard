@@ -49,6 +49,8 @@ const VacanciesEdit = React.lazy(() => import('./views/Vacancies/indexEdit'));
 const VacancyEdit = React.lazy(() => import('./views/Vacancies/VacancyEdit'));
 const VacanciesCreate = React.lazy(() => import('./views/Vacancies/indexCreate'));
 const VacancyDetail = React.lazy(() => import('./views/Vacancies/VacancyDetail'));
+const Profiles = React.lazy(() => import('./views/Profiles'));
+const ProfileDetail = React.lazy(() => import('./views/Profiles/detailProfile'));
 const YandexDirect = React.lazy(() => import('./views/YandexDirect'));
 const CreateCompany = React.lazy(() => import('./views/YandexDirect/createCompany/CreateCompany'));
 
@@ -111,6 +113,8 @@ const routes = [
   { path: '/vacancies/edit', exact: true, name: 'Вакансии', component: VacanciesEdit },
   { path: '/vacancy/edit/:id', exact: true, name: 'Вакансии', component: VacancyEdit },
   { path: '/vacancy/:id', exact: true, name: 'Вакансии', component: VacancyDetail },
+  { path: '/profiles/', exact: true, name: 'Профили', component: Profiles },
+  { path: '/profile/:id', exact: true, name: 'Профиль', component: ProfileDetail },
   { path: '/yandex-direct', exact: true, name: 'Yandex direct', component: YandexDirect },
   { path: '/yandex-direct/create-company', exact: true, name: 'Create company', component: CreateCompany },
 ];

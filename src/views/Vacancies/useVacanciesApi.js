@@ -41,7 +41,11 @@ export function useVacanciesApi() {
     }).then((result) => {
       if (result.status === 200) return result.clone().json();
     }).then((result) => {
-      if(!_.isEmpty(result)) setAllVacancies(result.items);
+      try {
+        if(!_.isEmpty(result)) setAllVacancies(result.items);
+      } catch (e) {
+        console.log(e);
+      }
     });
   };
   return [allVacancies, load, setAllVacancies];

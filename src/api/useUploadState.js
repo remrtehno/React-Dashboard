@@ -1,13 +1,15 @@
 import {useState} from "react";
 import HOST_URL from "../constants";
 import * as moment from 'moment';
+import _ from 'lodash';
 
 function useUploadState() {
  const [uploadState, setUploadState] = useState(null);
 
   const loadApi = () => {
     const token = localStorage.getItem('access_token');
-    fetch(HOST_URL +'/api/skillaz-candidates/upload-state', {
+    let url =  `${HOST_URL}/api/skillaz-candidates/upload-state`;
+    fetch(url, {
       method: 'get',
       headers: {
         'Accept': 'text/plain',
@@ -15,9 +17,13 @@ function useUploadState() {
       },
     }).then(json => {
       if(json.status === 500) return json.status;
-      return json.json();
+      if(json.statusText ==="OK") return json.json();
     }).then((result) => {
-      setUploadState(moment(result['uploadedAt'], 'YYYYMMDDTHH:mm').format("DD.MM.YYYY HH:mm"));
+      try {
+        if(!_.isEmpty(result)) setUploadState(moment(result['uploadedAt'], 'YYYYMMDDTHH:mm').format("DD.MM.YYYY HH:mm"));
+      } catch (e) {
+        console.log(e);
+      }
     })
   };
 

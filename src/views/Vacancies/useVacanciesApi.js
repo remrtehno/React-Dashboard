@@ -55,24 +55,24 @@ export function useVacancyApi() {
   const [vacancy, setVacancy] = useState([
     {
       "region": {
-        "id": "string",
-        "name": "string"
+        "id": "",
+        "name": ""
       },
       "profile": {
-        "id": "string",
-        "name": "string"
+        "id": "",
+        "name": ""
       },
-      "name": "string",
+      "name": "",
       "salary": {
         "from": 0,
         "to": 0,
-        "currency": "Undefined"
+        "currency": ""
       },
       "openPositions": 0,
       "externalIds": [
       ],
-      "status": "Active",
-      "id": "string"
+      "status": "",
+      "id": ""
     }
    ]);
 

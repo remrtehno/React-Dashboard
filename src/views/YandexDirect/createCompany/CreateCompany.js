@@ -5,7 +5,7 @@ import Step3 from './Step3';
 
 const Component = () => {
   const [state, setState] = useState({
-    currentStep: 1,
+    currentStep: 2,
     selectedCity: {},
     selectedProfiles: [],
     adverts: [],

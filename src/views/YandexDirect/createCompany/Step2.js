@@ -10,24 +10,26 @@ import {
   Input,
   Label,
   FormFeedback,
+  CustomInput,
 } from "reactstrap";
-import {useCardsApi, useImageByIdApi} from "../useYandexDirectApi";
+import {useCardsApi, uploadImageApi, useImagesApi, uploadCardsApi} from "../useYandexDirectApi";
+import { groupBy } from 'lodash'
 
-const handleDelete = (templates, index, setTemplates) => {
-  if (templates.length > 1) {
-    const newCards = templates.filter((template, i) => index !== i);
-    setTemplates(newCards)
+const handleDeleteTemplate = (cards, index, setCards) => {
+  if (cards.templates.length > 1) {
+    const newTemplates = cards.templates.filter((template, i) => index !== i);
+    setCards({...cards, templates: [...newTemplates]});
   }
 };
 
-const handleChange = (templates, index, value, type, setTemplates) => {
-  let newCards = [...templates];
-  let currentCard = templates.find((template, i) => i === index);
+const handleChangeTemplate = (cards, index, value, type, setCards) => {
+  let newTemplates = [...cards.templates];
+  let currentTemplate = cards.templates.find((template, i) => i === index);
 
-  currentCard[type] = value;
-  newCards[index] = currentCard;
+  currentTemplate[type] = value;
+  newTemplates[index] = currentTemplate;
 
-  setTemplates(newCards)
+  setCards({...cards, templates: [...newTemplates]});
 };
 
 const validateInput = (textLength, maxSymbols) => {
@@ -37,8 +39,8 @@ const validateInput = (textLength, maxSymbols) => {
   return isValid && !isEmpty
 };
 
-const renderCard = (templates, setTemplates) => {
-  return templates.map((template, index) => {
+const renderCard = (cards, setCards) => {
+  return cards.templates.map((template, index) => {
     return (
       <Col md='6' key={index + 'key'}>
         <Card>
@@ -49,7 +51,7 @@ const renderCard = (templates, setTemplates) => {
                 type="button"
                 className="close"
                 aria-label="Close"
-                onClick={() => handleDelete(templates, index, setTemplates)}
+                onClick={() => handleDeleteTemplate(cards, index, setCards)}
               >
                 <span aria-hidden="true">&times;</span>
               </button>
@@ -62,7 +64,7 @@ const renderCard = (templates, setTemplates) => {
                 <Input
                   invalid={!validateInput(template.header.length, 35)}
                   defaultValue={template.header}
-                  onChange={(e) => handleChange(templates, index, e.currentTarget.value, 'header', setTemplates)}
+                  onChange={(e) => handleChangeTemplate(cards, index, e.currentTarget.value, 'header', setCards)}
                 />
                 <FormFeedback>
                   {
@@ -80,7 +82,7 @@ const renderCard = (templates, setTemplates) => {
                   invalid={!validateInput(template.body.length, 81)}
                   type='textarea'
                   defaultValue={template.body}
-                  onChange={(e) => handleChange(templates, index, e.currentTarget.value, 'body', setTemplates)}
+                  onChange={(e) => handleChangeTemplate(cards, index, e.currentTarget.value, 'body', setCards)}
                 />
                 <FormFeedback>
                   {
@@ -111,9 +113,44 @@ const templateSplitter = (template) => {
   return newTemplate;
 };
 
-const renderImages = (images) => {
+const handleCheckImage = (e, setSelectedImages, image, selectedImages) => {
+  const isChecked = e.currentTarget.checked;
+  let newSelectedImages = [];
+
+  if (isChecked) {
+    newSelectedImages = [...selectedImages, image.id];
+  } else {
+    newSelectedImages = selectedImages.filter(selectedImage => selectedImage !== image.id);
+  }
+
+  setSelectedImages(newSelectedImages);
+};
+
+const handleImage = (e, uploadedImages, selectedImages, setUploadedImages, setSelectedImages) => {
+  const maxSize = e.currentTarget.size;
+  const file = e.currentTarget.files[0];
+  if (file.size <= maxSize) {
+    const fileId = `f${(+new Date).toString(16)}`;
+    setSelectedImages([...selectedImages, fileId]);
+    setUploadedImages([...uploadedImages, {file, id: fileId}]);
+  }
+};
+
+const renderImages = (cards, images, uploadedImages, selectedImages, setSelectedImages) => {
+  let currentImages = images.filter(image => {
+    return cards.imageIds.includes(image.id)
+  });
+
+  currentImages = [...currentImages, ...uploadedImages];
+
   if (images.length) {
-    return images.map(image => {
+    return currentImages.map((image, index) => {
+      const isLastChecked = selectedImages.length <= 1;
+      const isChecked = selectedImages.find(selectedImage => selectedImage === image.id);
+      const isUploadedImage = Boolean(image.file);
+
+      const src = isUploadedImage ? URL.createObjectURL(image.file) : `data:${image.contentType};base64, ${image.data}`;
+
       return (
         <Col
           key={image.id}
@@ -121,36 +158,98 @@ const renderImages = (images) => {
           md='3'
           xs='6'
         >
-          <img
-            className='border border-2 img-fluid'
-            src={`data:${image.contentType};base64, ${image.data}`}
-            alt={image.name}
-          />
+          <div className='d-flex justify-content-between'>
+            <FormGroup>
+              <CustomInput
+                className='m-0'
+                disabled={isLastChecked && isChecked}
+                defaultChecked={true}
+                id={image.id}
+                type='checkbox'
+                onChange={(e) => handleCheckImage(e, setSelectedImages, image, selectedImages)}
+              />
+            </FormGroup>
+            <Label for={image.id}>
+              <p className='font-italic font-weight-bold'>
+                {`Изображение #${index+1}`}
+              </p>
+            </Label>
+          </div>
+          <Label for={image.id}>
+            <img
+              className='border border-2 img-fluid'
+              src={src}
+              alt={image.name || image.file.name}
+            />
+          </Label>
         </Col>
       )
     })
   }
 };
 
-const Component = ({setStep, selectedCity, selectedProfiles}) => {
-  const [templates, setTemplates] = useState([]);
+const uploadCards = async (cards, selectedImages, uploadedImages) => {
+  let cardsToUpload = {
+    ...cards,
+    imageIds: selectedImages.filter(id => id.length >= 24)
+  };
 
+  let imagesToUpload = selectedImages
+      .filter(id => id.length < 24)
+      .map(id => {
+        const image = uploadedImages.find(image => image.id === id);
+
+        const data = new FormData();
+        data.append('File', image.file);
+        data.append('Type', 'Temporary');
+
+        return data
+      })
+      .map(formData =>
+        uploadImageApi(formData)
+          .then(id => {
+            cardsToUpload.imageIds.push(id);
+            // return id
+          })
+      );
+
+
+  cardsToUpload.imageIds = [...cardsToUpload.imageIds, ...imagesToUpload];
+
+  if (cardsToUpload.imageIds.length === selectedImages.length) {
+    uploadCardsApi(cardsToUpload);
+  }
+};
+
+const Component = ({setStep, selectedCity, selectedProfiles}) => {
+  const [cards, setCards] = useState({
+    regionId: selectedCity,
+    profileIds: selectedProfiles,
+    templates: [],
+    imageIds: []
+  });
+  const [selectedImages, setSelectedImages] = useState([]);
+  const [uploadedImages, setUploadedImages] = useState([]);
+
+  const [images, loadImages] = useImagesApi();
   const [allCards, loadCards] = useCardsApi();
-  const [images, loadImage] = useImageByIdApi();
 
   useEffect(() => {
     const selectedProfileIds = selectedProfiles.map(prof => prof.id);
     loadCards(selectedCity.id, selectedProfileIds)
   }, []);
 
-  if (allCards.templates && !templates.length) {
-    loadImage(allCards.imageIds);
+  if (allCards.templates && cards.templates && !cards.templates.length) {
+    loadImages();
 
     const newTemplates = allCards.templates.map(template => {
       return templateSplitter(template)
     });
 
-    setTemplates(newTemplates)
+    setCards({...allCards, templates: [...newTemplates]});
+    if (!selectedImages.length) {
+      setSelectedImages([...allCards.imageIds])
+    }
   }
 
   return (
@@ -164,11 +263,11 @@ const Component = ({setStep, selectedCity, selectedProfiles}) => {
         </span>
       </div>
       <Row className='w-100 mb-3'>
-        {renderCard(templates, setTemplates)}
+        {renderCard(cards, setCards)}
         <Col md='6'>
           <Button
             className='bg-turquoise-button text-white'
-            onClick={() => setTemplates([...templates, {header: '', body: ''}])}
+            onClick={() => setCards({...cards, templates: [...cards.templates, {header: '', body: ''}]})}
           >
             Добавить объявление +
           </Button>
@@ -181,14 +280,33 @@ const Component = ({setStep, selectedCity, selectedProfiles}) => {
           </span>
         </Col>
       </Row>
-      <Row className='border w-100 p-3 border-2'>
-        {renderImages(images)}
+      <Row className='border w-100 p-3 border-2 mb-3'>
+        {renderImages(cards, images, uploadedImages, selectedImages, setSelectedImages)}
+        <Col xs='3'>
+          <FormGroup className='w-100 m-0'>
+            <Label className='w-100 cursor-pointer btn btn-secondary bg-turquoise-button text-white'>
+              <input
+                className='d-none'
+                type='file'
+                size='5242880'
+                onChange={e => handleImage(e, uploadedImages, selectedImages, setUploadedImages, setSelectedImages)}
+              />
+              <span className='font-weight-bolder'>+</span> Добавить
+            </Label>
+          </FormGroup>
+          <div className='text-center'>
+            Максимальный размер 5MB
+          </div>
+        </Col>
       </Row>
       <div className='d-flex justify-content-between mb-3' style={{width: '400px'}}>
         <Button className='mr-2' onClick={() => setStep(1)}>
           &lt; Назад
         </Button>
-        <Button className='ml-2 bg-turquoise-button text-white' onClick={() => setStep(3)}>
+        <Button
+          className='ml-2 bg-turquoise-button text-white'
+          onClick={() => uploadCards(cards, selectedImages, uploadedImages)}
+        >
           Далее &gt;
         </Button>
       </div>

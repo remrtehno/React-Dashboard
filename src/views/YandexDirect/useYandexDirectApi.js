@@ -16,7 +16,6 @@ export function useCompaniesApi() {
       },
     }).then((result) => {
       if (result.status === 200) {
-        console.log(result)
         setAllCompanies(result.data.items);
       }
     }).catch(err => {
@@ -76,7 +75,7 @@ export function useCardsApi() {
           'Accept': 'text/plain',
           'Authorization': 'Bearer ' + token
         },
-        params: { regionId: "5e35aca51acb3417c8381c2d", profileIds: ["5e35af60f7acdf352c83b500"] + '' }
+        params: { regionId, profileIds: profileIds + '' }
       }).then((result) => {
       setAllCards(result.data);
     }).catch(err => {
@@ -87,46 +86,68 @@ export function useCardsApi() {
   return [allCards, loadCards];
 }
 
-export function useImagesApi() {
-  const [images, setImage] = useState([]);
+// export function useImagesApi() {
+//   const [images, setImage] = useState([]);
+//
+//   const loadImages = () => {
+//     axios
+//       .get(HOST_URL + '/api/images',  {
+//         headers: {
+//           'Accept': 'text/plain',
+//           'Authorization': 'Bearer ' + token
+//         },
+//       }).then((result) => {
+//         console.log(result)
+//         setImage(result.data.items);
+//       }).catch(err => {
+//         console.log(err)
+//       });
+//   };
+//
+//   return [images, loadImages];
+// }
 
-  const loadImages = () => {
-    axios
-      .get(HOST_URL + '/api/images',  {
-        headers: {
-          'Accept': 'text/plain',
-          'Authorization': 'Bearer ' + token
-        },
-      }).then((result) => {
-        setImage(result.data.items);
-      }).catch(err => {
-        console.log(err)
-      });
+export function useImageByIdApi() {
+  const [images, setImages] = useState([]);
+
+  const loadImages = async (imageIds) => {
+    const loadedImages = await Promise.all(
+      imageIds.map(async id => {
+        return await axios
+          .get(HOST_URL + `/api/images/${id}`, {
+            responseType: 'arraybuffer',
+            headers: {
+              'Accept': '*/*',
+              'Authorization': 'Bearer ' + token
+            },
+          }).then(res => ({data: _imageEncode(res.data), id}))
+      })
+    );
+
+    setImages(loadedImages);
   };
+
+  function _imageEncode (arrayBuffer) {
+    let u8 = new Uint8Array(arrayBuffer);
+    let b64encoded = btoa([].reduce.call(new Uint8Array(arrayBuffer),function(p,c){return p+String.fromCharCode(c)},''));
+    let mimetype="image/png";
+
+    return "data:"+mimetype+";base64,"+b64encoded
+  }
 
   return [images, loadImages];
 }
 
-export function useImageByIdApi() {
-  const [images, setImages] = useState([]);
-  const loadImage = (imageIds) => {
-    imageIds.map(id => {
-      axios
-        .get(HOST_URL + `/api/images/${id}`,  {
-          headers: {
-            'Accept': 'text/plain',
-            'Authorization': 'Bearer ' + token
-          },
-        }).then((result) => {
-          console.log(result)
-        setImages([...images, {data: result.data, id}]);
-      }).catch(err => {
-        console.log(err)
-      });
-    })
-  };
-
-  return [images, loadImage];
+export async function uploadCompany(company) {
+  return await axios
+    .post(HOST_URL + '/api/yandex-direct/creation-wizard', company, {
+      headers: {
+        'Accept': 'text/plan',
+        'Authorization': 'Bearer ' + token
+      }
+    }).then(res => {
+      return res.data
+    }).catch(err => console.log(err))
 }
 
 export function uploadCardsApi(cards) {
@@ -138,7 +159,7 @@ export function uploadCardsApi(cards) {
         'Authorization': 'Bearer ' + token
       }
     }).then(res => {
-      console.log(res)
+      return res.data
     }).catch(err => console.log(err))
 }
 

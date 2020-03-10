@@ -12,8 +12,7 @@ import {
   FormFeedback,
   CustomInput,
 } from "reactstrap";
-import {useCardsApi, uploadImageApi, useImagesApi, uploadCardsApi} from "../useYandexDirectApi";
-import { groupBy } from 'lodash'
+import {useCardsApi, uploadImageApi, uploadCardsApi, useImageByIdApi} from "../useYandexDirectApi";
 
 const handleDeleteTemplate = (cards, index, setCards) => {
   if (cards.templates.length > 1) {
@@ -149,7 +148,7 @@ const renderImages = (cards, images, uploadedImages, selectedImages, setSelected
       const isChecked = selectedImages.find(selectedImage => selectedImage === image.id);
       const isUploadedImage = Boolean(image.file);
 
-      const src = isUploadedImage ? URL.createObjectURL(image.file) : `data:${image.contentType};base64, ${image.data}`;
+      const src = isUploadedImage ? URL.createObjectURL(image.file) : image.data;
 
       return (
         <Col
@@ -179,7 +178,7 @@ const renderImages = (cards, images, uploadedImages, selectedImages, setSelected
             <img
               className='border border-2 img-fluid'
               src={src}
-              alt={image.name || image.file.name}
+              alt='image'
             />
           </Label>
         </Col>
@@ -188,13 +187,13 @@ const renderImages = (cards, images, uploadedImages, selectedImages, setSelected
   }
 };
 
-const uploadCards = async (cards, selectedImages, uploadedImages) => {
+const uploadCards = async (cards, selectedImages, uploadedImages, setAdTexts, setStep) => {
   let cardsToUpload = {
     ...cards,
     imageIds: selectedImages.filter(id => id.length >= 24)
   };
 
-  let imagesToUpload = selectedImages
+  let imagesToUpload = await Promise.all(selectedImages
       .filter(id => id.length < 24)
       .map(id => {
         const image = uploadedImages.find(image => image.id === id);
@@ -205,23 +204,19 @@ const uploadCards = async (cards, selectedImages, uploadedImages) => {
 
         return data
       })
-      .map(formData =>
-        uploadImageApi(formData)
-          .then(id => {
-            cardsToUpload.imageIds.push(id);
-            // return id
-          })
-      );
+      .map(formData => uploadImageApi(formData)));
 
 
   cardsToUpload.imageIds = [...cardsToUpload.imageIds, ...imagesToUpload];
 
   if (cardsToUpload.imageIds.length === selectedImages.length) {
-    uploadCardsApi(cardsToUpload);
+    uploadCardsApi(cardsToUpload).then(res => {
+      setAdTexts(res.adTexts);
+    })
   }
 };
 
-const Component = ({setStep, selectedCity, selectedProfiles}) => {
+const Component = ({setStep, setAdTexts, selectedCity, selectedProfiles}) => {
   const [cards, setCards] = useState({
     regionId: selectedCity,
     profileIds: selectedProfiles,
@@ -231,16 +226,16 @@ const Component = ({setStep, selectedCity, selectedProfiles}) => {
   const [selectedImages, setSelectedImages] = useState([]);
   const [uploadedImages, setUploadedImages] = useState([]);
 
-  const [images, loadImages] = useImagesApi();
   const [allCards, loadCards] = useCardsApi();
+  const [images, loadImages] = useImageByIdApi();
 
   useEffect(() => {
     const selectedProfileIds = selectedProfiles.map(prof => prof.id);
-    loadCards(selectedCity.id, selectedProfileIds)
+    loadCards(selectedCity.id, selectedProfileIds);
   }, []);
 
   if (allCards.templates && cards.templates && !cards.templates.length) {
-    loadImages();
+    loadImages(allCards.imageIds);
 
     const newTemplates = allCards.templates.map(template => {
       return templateSplitter(template)
@@ -305,7 +300,7 @@ const Component = ({setStep, selectedCity, selectedProfiles}) => {
         </Button>
         <Button
           className='ml-2 bg-turquoise-button text-white'
-          onClick={() => uploadCards(cards, selectedImages, uploadedImages)}
+          onClick={() => uploadCards(cards, selectedImages, uploadedImages, setAdTexts, setStep)}
         >
           Далее &gt;
         </Button>

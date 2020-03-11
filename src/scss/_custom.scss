@@ -76,3 +76,23 @@
 .cursor-pointer {
   cursor: pointer;
 }
+
+.tasks {
+   li {
+     position: relative;
+   }
+  .action-buttons {
+    position: absolute;
+    top: 10px;
+    right: 10px;
+    background: #fff;
+    a {
+      color: black;
+      margin: 0 5px;
+      font-size: 15px;
+      &:hover {
+        color: inherit;
+      }
+    }
+  }
+}

@@ -1,7 +1,6 @@
 import React, {useEffect, useState} from 'react';
-import {Col, Row, Button, Input, Modal, ModalBody} from "reactstrap";
+import {Col, Row, Button, Input} from "reactstrap";
 import _ from 'lodash';
-import Select from 'react-select';
 import Fuse from 'fuse.js';
 import useProfilesApi from "./useProfilesApi";
 import {Link} from "react-router-dom";
@@ -11,7 +10,6 @@ const Component = () => {
   const [, load, getProfiles] = useProfilesApi();
   const [filters, setFilters] = useState({});
   const [fuseQuery, setFuseQuery] = useState(null);
-  const [modal, setModal] = useState({modal: false});
 
   useEffect(() => {
     load();
@@ -19,26 +17,9 @@ const Component = () => {
 
   let filteredProfile = _.filter(getProfiles, filters);
   const fuse = new Fuse(filteredProfile, { keys: ['name'] });
-  const toggle = () => {
-    setModal({modal: !modal.modal, });
-  };
-
   if(fuseQuery) {
     filteredProfile = fuse.search(fuseQuery);
   }
-
-  console.log(filteredProfile);
-
-  const getFields = (field) => {
-    if(getProfiles.length === 0) return [];
-    // return getProfiles.reduce( (result, object) => {
-    //   (Array.isArray(result) || (result = []));
-    //   if(result.find( name => name.value === object[field].name)) return result;
-    //   result.push({value: object[field].name, label: object[field].name});
-    //   return result;
-    // });
-    return ;
-  };
 
   return (
     <div className="animated fadeIn">
@@ -60,7 +41,7 @@ const Component = () => {
               />
             </Col>
             <Col >
-              <Link to='/'>
+              <Link to="/profiles/create">
                 <Button className='bg-turquoise-button text-white'>
                   Новый профиль +
                 </Button>
@@ -77,7 +58,7 @@ const Component = () => {
                       {`${value.name}`}
                     </div>
                     <div>
-                      <Link to={`/profile/${value.id}`} >
+                      <Link to={`/profile/edit/${value.id}`} >
                         <Button color="primary">Редактировать</Button>
                       </Link>
                     </div>

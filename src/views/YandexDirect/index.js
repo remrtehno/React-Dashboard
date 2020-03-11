@@ -1,10 +1,10 @@
 import React, {useEffect, useState} from 'react';
 import { Table, Row, Col, Container, Button, Input, Label } from 'reactstrap';
-import { useCompaniesApi } from "./useYandexDirectApi";
+import { useCompaniesApi, changeCompanyStatusApi } from "./useYandexDirectApi";
 import { Link } from 'react-router-dom';
 import Select from 'react-select';
 
-const mockHeaders = [
+const headers = [
   'Кампания',
   'Вакансии',
   'Бюджет',
@@ -14,7 +14,27 @@ const mockHeaders = [
   'Интервью / CPA',
 ];
 
-const renderTableRows = (rows) => {
+const changeCompanyStatus = (row, status, allCompanies, setAllCompanies) => {
+  const newCompanyStatus = status === 'start' ? 'on' : 'off';
+
+  if (newCompanyStatus !== row.state) {
+    changeCompanyStatusApi(row.id, status).then(success => {
+      if (success) {
+        const newCompanies = allCompanies.map(company => {
+          if (company.id === row.id) {
+            return {...company, state: newCompanyStatus};
+          }
+
+          return company
+        });
+
+        setAllCompanies(newCompanies)
+      }
+    })
+  }
+};
+
+const renderTableRows = (rows, allCompanies, setAllCompanies) => {
   if (rows.length > 0) {
     return rows.map(row => {
       if (row.state === 'archived') {
@@ -24,20 +44,23 @@ const renderTableRows = (rows) => {
       const colClasses = `mr-1 ml-1 text-center align-middle ${backgroundColor}`;
 
       let iconsClasses = {
-        active: 'fa fa-play-circle fa-2x',
-        stopped: 'fa fa-stop-circle fa-2x mr-2',
-        inEdition: 'fa fa-gear fa-2x mr-2'
+        active: 'fa fa-play-circle fa-2x cursor-pointer',
+        stopped: 'fa fa-stop-circle fa-2x mr-2 cursor-pointer',
+        inEdition: 'fa fa-gear fa-2x mr-2 cursor-pointer'
       };
 
       switch (row.state) {
         case 'on':
           iconsClasses.active += ' text-black-50';
+          iconsClasses.active = iconsClasses.active.replace('cursor-pointer', '');
           break;
         case 'off':
           iconsClasses.stopped += ' text-black-50';
+          iconsClasses.stopped = iconsClasses.stopped.replace('cursor-pointer', '');
           break;
         case 'edit':
           iconsClasses.inEdition += ' text-black-50';
+          iconsClasses.inEdition = iconsClasses.inEdition.replace('cursor-pointer', '');
           break;
         default:
           break
@@ -48,7 +71,6 @@ const renderTableRows = (rows) => {
       row.vacancies.map((vacancy, index) => {
         vacancies += vacancy.name;
         if (index < (row.vacancies.length-1)) {
-
           vacancies += ', '
         }
       });
@@ -64,8 +86,14 @@ const renderTableRows = (rows) => {
             </span>
             <div style={{minWidth: '90px'}}>
               <i className={iconsClasses.inEdition}/>
-              <i className={iconsClasses.stopped}/>
-              <i className={iconsClasses.active}/>
+              <i
+                className={iconsClasses.stopped}
+                onClick={() => changeCompanyStatus(row, 'stop', allCompanies, setAllCompanies)}
+              />
+              <i
+                className={iconsClasses.active}
+                onClick={() => changeCompanyStatus(row, 'start', allCompanies, setAllCompanies)}
+              />
             </div>
           </td>
           <td className={colClasses}>
@@ -186,7 +214,7 @@ const filterCompanies = (rows, filters) => {
 };
 
 const Component = () => {
-  const [getAllCompanies, load] = useCompaniesApi();
+  const [getAllCompanies, load, setAllCompanies] = useCompaniesApi();
   const [filters, setFilters] = useState({
     company: 'Все',
     region: 'Все',
@@ -196,6 +224,8 @@ const Component = () => {
   useEffect(() => {
     load();
   }, []);
+
+  console.log(getAllCompanies)
 
   const filteredCompanies = filterCompanies(getAllCompanies, filters);
 
@@ -261,7 +291,7 @@ const Component = () => {
         <thead>
           <tr>
             {
-              mockHeaders.map((header, index) => {
+              headers.map((header, index) => {
                 return (
                   <th key={index} className='bg-turquoise text-center'>
                     {header}
@@ -272,7 +302,7 @@ const Component = () => {
           </tr>
         </thead>
         <tbody>
-          {renderTableRows(filteredCompanies)}
+          {renderTableRows(filteredCompanies, getAllCompanies, setAllCompanies)}
         </tbody>
       </Table>
     </Container>

@@ -22,7 +22,7 @@ export function useCompaniesApi() {
       console.log(err)
     });
   };
-  return [allCompanies, load];
+  return [allCompanies, load, setAllCompanies];
 }
 
 export function useRegionsApi() {
@@ -173,4 +173,15 @@ export function uploadImageApi(data) {
     }).then(res => {
       return res.data
     }).catch(err => console.log(err))
+}
+
+export async function changeCompanyStatusApi(id, status) {
+  return await axios
+    .post(`${HOST_URL}/api/yandex-direct/campaigns/${id}/${status}`, null, {
+      headers: {
+        'Authorization': 'Bearer ' + token
+      }
+    }).then(res => {
+      return res.status === 200
+    })
 }

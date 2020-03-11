@@ -5,16 +5,17 @@ import Step3 from './Step3';
 
 const Component = () => {
   const [state, setState] = useState({
-    currentStep: 2,
+    currentStep: 1,
     selectedCity: {},
     selectedProfiles: [],
-    adverts: [],
+    adTexts: [],
   });
 
   if (state.currentStep === 2) {
     return (
       <Step2
         setStep={value => setState({...state, currentStep: value})}
+        setAdTexts={value => setState({...state, adTexts: value, currentStep: 3})}
         selectedCity={state.selectedCity}
         selectedProfiles={state.selectedProfiles}
       />
@@ -23,6 +24,7 @@ const Component = () => {
     return (
       <Step3
         setStep={value => setState({...state, currentStep: value})}
+        companyInfo={state}
       />
     )
   } else {

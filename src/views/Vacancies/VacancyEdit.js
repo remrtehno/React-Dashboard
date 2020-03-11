@@ -53,6 +53,8 @@ const Component = (props) => {
     });
   };
 
+  console.log(vacancy);
+
   return (
     <div className="animated fadeIn">
       <Row>
@@ -71,11 +73,11 @@ const Component = (props) => {
         </Col>
         <Col lg="5" className="mb-3">
           Зарплата От
-          <Input type="text" onChange={(event) => { editVacancy(event.target.value, 'salary','from') } } value={vacancy.map( field => field.salary.from )}  />
+          <Input type="text" onChange={(event) => { editVacancy(event.target.value.replace (/[^0-9]+$/, ''), 'salary','from') } } value={vacancy.map( field => field.salary.from )}  />
         </Col>
         <Col lg="5" className="mb-3">
           Зарплата До
-          <Input type="text"  onChange={(event) => { editVacancy(event.target.value, 'salary','to') } } value={vacancy.map( field => field.salary.to )}  />
+          <Input type="text"  onChange={(event) => { editVacancy(event.target.value.replace (/[^0-9]+$/, ''), 'salary','to') } } value={vacancy.map( field => field.salary.to )}  />
         </Col>
         <Col lg="2" className="mb-3">
           Валюта

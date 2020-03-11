@@ -13,9 +13,9 @@ const Reports = () => {
   const [allRegion, setAllRegion] = useState({});
   const [selectRegion, setSelectRegion] = useState({});
   const [regions, setRegions] = useState({
-    "name": "string",
-    "nameDative": "string",
-    "utm": "string",
+    "name": "",
+    "nameDative": "",
+    "utm": "",
     "yandexRegions": []
   });
 
@@ -52,7 +52,7 @@ const Reports = () => {
   };
 
   const getAllRegions = (query = "") => {
-    if(query === " " || !query) return;
+   if(query === " " || !query) return;
 
     const token = localStorage.getItem('access_token');
     let url = new URL(HOST_URL +`/api/yandex-direct/regions`);

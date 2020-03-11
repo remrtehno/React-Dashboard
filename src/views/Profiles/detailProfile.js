@@ -60,13 +60,13 @@ const Component = (props) => {
         <Col lg="4" className="mb-3">
           <h5>Ключевые фразы</h5>
           <div className="vertical-scroll">
-            { _.map(profile.keywords, name => { return name ? name+', ': 'Не указаны'; }) }
+            { profile.keywords }
           </div>
         </Col>
         <Col lg="4" className="mb-3">
           <h5>Минус фразы</h5>
           <div className="vertical-scroll">
-            { _.map(profile.negativeKeywords, name => { return name ? name+', ': 'Не указаны'; }) }
+            { profile.negativeKeywords }
           </div>
         </Col>
         <Col lg="4" className="mb-3">

@@ -83,5 +83,10 @@ export default {
       url: '/yandex-direct',
       icon: 'icon-settings',
     },
+    {
+      name: 'Leads',
+      url: '/leads',
+      icon: 'icon-settings',
+    }
   ],
 };

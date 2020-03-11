@@ -53,8 +53,7 @@ const Profiles = React.lazy(() => import('./views/Profiles'));
 const ProfileDetail = React.lazy(() => import('./views/Profiles/detailProfile'));
 const YandexDirect = React.lazy(() => import('./views/YandexDirect'));
 const CreateCompany = React.lazy(() => import('./views/YandexDirect/createCompany/CreateCompany'));
-
-
+const Leads = React.lazy(() => import('./views/Leads/Leads'));
 
 // https://github.com/ReactTraining/react-router/tree/master/packages/react-router-config
 const routes = [
@@ -117,6 +116,7 @@ const routes = [
   { path: '/profile/:id', exact: true, name: 'Профиль', component: ProfileDetail },
   { path: '/yandex-direct', exact: true, name: 'Yandex direct', component: YandexDirect },
   { path: '/yandex-direct/create-company', exact: true, name: 'Create company', component: CreateCompany },
+  { path: '/leads', exact: true, name: 'Leads', component: Leads },
 ];
 
 export default routes;

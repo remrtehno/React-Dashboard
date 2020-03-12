@@ -1,5 +1,6 @@
 import React, {useState, useEffect} from 'react';
 import moment from "moment";
+import {debounce} from 'lodash';
 import {Col, Row, Input} from "reactstrap";
 import Select from 'react-select';
 
@@ -13,16 +14,35 @@ const getAllState = async () => {
 
   return {
     leads,
-    vacancies: vacancies.items,
-    regions: regions.items,
+    vacancies: vacancies && vacancies.items,
+    regions: regions && regions.items,
     sources
   }
 };
 
-const getCampaignsByRegion = async (selectedRegion) => {
-  const campaigns = await get('/api/yandex-direct/campaigns', {regionId: selectedRegion.id});
+const getLeadsByFilter = async (filterValues) => {
+  let params = {};
+  const filterFields = Object.keys(filterValues);
+  filterFields.map(field => {
+    params[field] = filterValues[field]
+  });
 
-  return campaigns.items
+  if (Object.keys(params).length) {
+    return await get('/api/leads', JSON.stringify(params))
+  }
+  return false
+};
+
+const getCampaignsByRegion = async (regionIds) => {
+  if (regionIds.length) {
+    const campaigns = await get('/api/yandex-direct/campaigns', {regionIds});
+    return campaigns.items
+  }
+  return []
+};
+
+const handleSearch = (e, filterValues, setFilterValues) => {
+  setFilterValues({...filterValues, TextSearch: e.target.value})
 };
 
 const renderLeadsCards = (leads) => {
@@ -38,6 +58,7 @@ const renderLeadsCards = (leads) => {
       id,
       createdAt,
       generatedId,
+      mainSource,
       campaign,
       utmRegion,
       utmSource,
@@ -50,10 +71,10 @@ const renderLeadsCards = (leads) => {
       <div className="vacancy" key={id}>
         <div className='d-flex justify-content-between'>
           <div className='d-flex flex-column'>
-            <div className='name'>
-              <span className='mr-4'>{`${firstName} ${lastName} ${middleName}`}</span>
-              <span className='mr-4'>{region.name}</span>
-              <span><u>{vacancy.name}</u></span>
+            <div className='name d-flex flex-wrap'>
+              <div className='mr-4'>{`${firstName} ${lastName} ${middleName}`}</div>
+              <div className='mr-4'>{region.name}</div>
+              <div><u>{vacancy.name}</u></div>
             </div>
             <a
               href={`mailto:${emailAddress}`}
@@ -72,7 +93,7 @@ const renderLeadsCards = (leads) => {
             <tbody>
               <tr>
                 <td>{createdDate}</td>
-                <td>{campaign || 'Кампания отсутствует'}</td>
+                <td>{mainSource || 'Кампания отсутствует'}</td>
               </tr>
               <tr>
                 <td>{generatedId}</td>
@@ -107,7 +128,7 @@ const Component = () => {
     campaigns: []
   });
 
-  const [selectedValues, setSelectedValues] = useState({});
+  const [filterValues, setFilterValues] = useState({});
 
   useEffect(() => {
     const {leads, vacancies, region} = initialData;
@@ -122,30 +143,52 @@ const Component = () => {
   }, []);
 
   useEffect(() => {
-    const { region } = selectedValues;
-    if (region)
-    getCampaignsByRegion(region)
+    const { RegionIds } = filterValues;
+    if (RegionIds)
+    getCampaignsByRegion(RegionIds)
       .then(campaigns => {
         setInitialData({...initialData, campaigns})
       })
-  }, [selectedValues.region]);
+  }, [filterValues.RegionIds]);
+
+  useEffect(() => {
+    getLeadsByFilter(filterValues).then(leads => {
+      if (leads) {
+        setInitialData({...initialData, leads})
+      }
+    })
+  }, [filterValues]);
+
+  const delayedSearch = debounce(handleSearch, 600);
 
   return (
     <div className="animated fadeIn">
       <Row>
         <Col lg="12" className="mb-3">
           <Row>
-            <Col className='d-flex align-middle mb-3'>
+            <Col className='d-flex align-middle mb-3' xl='4' >
               <h2 className="mb-0 mr-3">Лиды</h2>
               <Input
                 placeholder='Поиск'
+                onChange={(e) => {
+                  e.persist();
+                  delayedSearch(e, filterValues, setFilterValues)
+                }}
               />
             </Col>
-            <Col lg="6" md='8'>
+            <Col xl="8">
               <Row>
                 <Col>
                   <Select
-                    placeholder='Статус'
+                    placeholder='Вакансии'
+                    getOptionLabel={option => option.name}
+                    getOptionValue={option => option.id}
+                    isMulti
+                    closeMenuOnSelect={false}
+                    options={initialData.vacancies}
+                    onChange={vacancies => (
+                      setFilterValues({...filterValues, vacancyIds: vacancies.map(vacancy => vacancy.id)})
+                    )}
                   />
                 </Col>
                 <Col>
@@ -153,22 +196,35 @@ const Component = () => {
                     placeholder='Регионы'
                     getOptionLabel={option => option.name}
                     getOptionValue={option => option.id}
+                    isMulti
+                    closeMenuOnSelect={false}
                     options={initialData.regions}
-                    onChange={selected => setSelectedValues({...selectedValues, region: selected})}
+                    onChange={regions => (
+                      setFilterValues({...filterValues, RegionIds: regions.map(region => region.id)})
+                    )}
                   />
                 </Col>
                 <Col>
                   <Select
                     placeholder='Источник'
+                    getOptionLabel={option => option}
+                    getOptionValue={option => option}
+                    options={initialData.sources}
+                    onChange={MainSource => setFilterValues({...filterValues, MainSource})}
                   />
                 </Col>
                 <Col>
                   <Select
+                    isDisabled={!initialData.campaigns.length}
                     placeholder='Кампании'
                     getOptionLabel={option => option.name}
                     getOptionValue={option => option.id}
+                    isMulti
+                    closeMenuOnSelect={false}
                     options={initialData.campaigns}
-                    onChange={(selected => setSelectedValues({...selectedValues, campaigns: selected}))}
+                    onChange={campaigns => (
+                      setFilterValues({...filterValues, CampaignIds: campaigns.map(campaign => campaign.id)})
+                    )}
                   />
                 </Col>
               </Row>

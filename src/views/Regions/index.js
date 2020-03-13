@@ -1,9 +1,8 @@
 import React, {useEffect, useState} from 'react';
-import HOST_URL from "../../constants";
-import {Col, Row, Input, Button, Table, CardBody} from "reactstrap";
+import {Col, Row, Button, Table, CardBody} from "reactstrap";
 import _ from 'lodash';
 import {Link} from "react-router-dom";
-import Select from 'react-select'
+import {get} from '../../api';
 
 
 const Reports = () => {
@@ -32,87 +31,90 @@ const Reports = () => {
     }
   });
 
-  const saveToBDAPI = () => {
-    saveToBd.yandexRegions = _.cloneDeep(fill);
-    let token = localStorage.getItem('access_token');
-    fetch(HOST_URL +'/api/regions', {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-        'Authorization': 'Bearer ' + token
-      },
-      body: JSON.stringify(saveToBd),
-    }).then((result) => {
-      if(result.status === 500) alert('error');
-      if (result.status === 200) {
-        alert('Ok');
-        window.location.reload();
-      }
-    })
-  };
+  // const saveToBDAPI = () => {
+  //   saveToBd.yandexRegions = _.cloneDeep(fill);
+  //   let token = localStorage.getItem('access_token');
+  //   fetch(HOST_URL +'/api/regions', {
+  //     method: 'POST',
+  //     headers: {
+  //       'Content-Type': 'application/json',
+  //       'Authorization': 'Bearer ' + token
+  //     },
+  //     body: JSON.stringify(saveToBd),
+  //   }).then((result) => {
+  //     if(result.status === 500) alert('error');
+  //     if (result.status === 200) {
+  //       alert('Ok');
+  //       window.location.reload();
+  //     }
+  //   })
+  // };
 
-  const getAllRegions = (query = "") => {
-    if(query === " " || !query) return;
+  // const getAllRegions = (query = "") => {
+  //   if(query === " " || !query) return;
+  //
+  //   const token = localStorage.getItem('access_token');
+  //   let url = new URL(HOST_URL +`/api/yandex-direct/regions`);
+  //   let params = {search: query};
+  //   Object.keys(params).forEach(key => url.searchParams.append(key, params[key]));
+  //
+  //   fetch(url, {
+  //     method: 'GET',
+  //     headers: {
+  //       'Accept': 'text/plain',
+  //       'Authorization': 'Bearer ' + token
+  //     },
+  //   }).then((result) => {
+  //     if (result.status === 200) {
+  //       return result.clone().json()
+  //     }
+  //   }).then((result) => {
+  //     setAllRegion(result.items);
+  //     setSearchField(
+  //       _.map(result.items, (value) => { return {value: value.name, label: value.name}; })
+  //     );
+  //   });
+  // };
 
-    const token = localStorage.getItem('access_token');
-    let url = new URL(HOST_URL +`/api/yandex-direct/regions`);
-    let params = {search: query};
-    Object.keys(params).forEach(key => url.searchParams.append(key, params[key]));
+  // const getRegions = () => {
+  //   const token = localStorage.getItem('access_token');
+  //   fetch(HOST_URL +`/api/regions`, {
+  //     method: 'GET',
+  //     headers: {
+  //       'Accept': 'text/plain',
+  //       'Authorization': 'Bearer ' + token
+  //     },
+  //   }).then((result) => {
+  //     if (result.status === 200) {
+  //       return result.clone().json()
+  //     }
+  //   }).then((result) => {
+  //     setLoadRegions(result);
+  //   });
+  // };
 
-    fetch(url, {
-      method: 'GET',
-      headers: {
-        'Accept': 'text/plain',
-        'Authorization': 'Bearer ' + token
-      },
-    }).then((result) => {
-      if (result.status === 200) {
-        return result.clone().json()
-      }
-    }).then((result) => {
-      setAllRegion(result.items);
-      setSearchField(
-        _.map(result.items, (value) => { return {value: value.name, label: value.name}; })
-      );
-    });
-  };
-
-  function getRegions() {
-    const token = localStorage.getItem('access_token');
-    fetch(HOST_URL +`/api/regions`, {
-      method: 'GET',
-      headers: {
-        'Accept': 'text/plain',
-        'Authorization': 'Bearer ' + token
-      },
-    }).then((result) => {
-      if (result.status === 200) {
-        return result.clone().json()
-      }
-    }).then((result) => {
-      setLoadRegions(result);
-    });
-  }
-
-  function deleteRegion(id) {
-    const token = localStorage.getItem('access_token');
-    fetch(HOST_URL +`/api/regions/${id}`, {
-      method: 'DELETE',
-      headers: {
-        'Accept': '*/*',
-        'Authorization': 'Bearer ' + token
-      },
-    }).then((result) => {
-      if (result.status === 200) {
-        getRegions();
-        alert('Ok');
-        console.log(result)
-      }
-    });
-  }
+  // function deleteRegion(id) {
+  //   const token = localStorage.getItem('access_token');
+  //   fetch(HOST_URL +`/api/regions/${id}`, {
+  //     method: 'DELETE',
+  //     headers: {
+  //       'Accept': '*/*',
+  //       'Authorization': 'Bearer ' + token
+  //     },
+  //   }).then((result) => {
+  //     if (result.status === 200) {
+  //       getRegions();
+  //       alert('Ok');
+  //       console.log(result)
+  //     }
+  //   });
+  // }
 
   useEffect(() => {
-    getRegions();
+    get('/api/regions')
+      .then(res => {
+        setLoadRegions(res);
+      })
   }, []);
 
   return (
@@ -121,27 +123,32 @@ const Reports = () => {
         <Col lg="12" className="mb-sm-5 mb-5">
           <h2 className="mb-4"> Список регионов </h2>
           <CardBody className="p-0">
-            <Table responsive striped hover>
-              <tbody>
+            <Table responsive hover>
+              <thead className='thead-dark'>
               <tr>
-                <td> Город </td>
-                <td> Регион </td>
-                <td className="text-right"></td>
+                <th> Город </th>
+                <th> Регион </th>
+                <th className="text-right"/>
               </tr>
+              </thead>
+              <tbody>
               {
                 _.map(loadRegions.items, (value, key) => {
                   return (
                     <tr key={key}>
                       <td>{`${value.name}`}</td>
                       <td  width="240">
-                        { value.yandexRegions.map( regions => {
-                          return regions.name + ', ';
-                        }) }
+                        { value.yandexRegions.map((region, index) => {
+                            return index < value.yandexRegions.length - 1 ?
+                              region.name + ', ' :
+                              region.name
+                          })
+                        }
                       </td>
                       <td className="text-right">
-                          <Link to={`/region/${value.id}`}>
-                            <Button color="primary">Подробнее</Button>
-                          </Link>
+                        <Link to={`/region/${value.id}`}>
+                          <Button color="primary">Подробнее</Button>
+                        </Link>
                       </td>
                     </tr>
                   )

@@ -1,7 +1,7 @@
 import React, {useEffect, useState} from 'react';
-import {useHistory, Link} from 'react-router-dom';
-import {useImageByIdApi, uploadCompany} from "../useYandexDirectApi";
+import {useHistory} from 'react-router-dom';
 import {FormGroup, Input, Label, FormFeedback, Button} from "reactstrap";
+import {getImagesByIdsApi, post} from "../../../api"
 
 const validateInput = (value, maxValue, minValue = null) => { // weeklyBudget don't have min value
   const isBigger = value > maxValue;
@@ -82,14 +82,14 @@ const handleSubmit = async (price, companyInfo) => {
   const profileIds = selectedProfiles.map(profile => profile.id);
   const company = {...price, regionId: selectedCity.id, profileIds, adTexts};
 
-  return await uploadCompany(company).then((res) => res)
+  return await post('/api/yandex-direct/creation-wizard', company).then(res => res)
 };
 
 const Component = ({setStep, companyInfo}) => {
   let history = useHistory();
 
   const [price, setPrice] = useState({weeklyBudget: 2990, bidCeiling: 3.5});
-  const [images, loadImages] = useImageByIdApi();
+  const [images, loadImages] = getImagesByIdsApi();
 
   const { adTexts } = companyInfo;
   const imageIds = adTexts.map(ad => ad.imageId);
@@ -133,7 +133,7 @@ const Component = ({setStep, companyInfo}) => {
               type='number'
               defaultValue='2990'
               max='199000'
-              onChange={(e) => setPrice({...price, weeklyBudget: e.currentTarget.value})}
+              onChange={(e) => setPrice({...price, weeklyBudget: +e.currentTarget.value})}
             />
             <FormFeedback>
               {invalidMessage.weekPrise}
@@ -148,7 +148,7 @@ const Component = ({setStep, companyInfo}) => {
               type='number'
               defaultValue='3.50'
               step='0.1' max='50' min='0.5'
-              onChange={(e) => setPrice({...price, bidCeiling: e.currentTarget.value})}
+              onChange={(e) => setPrice({...price, bidCeiling: +e.currentTarget.value})}
             />
             <FormFeedback>
               {invalidMessage.clickPrise}

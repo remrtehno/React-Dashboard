@@ -55,7 +55,7 @@ const ProfileEdit = React.lazy(() => import('./views/Profiles/editProfile'));
 const ProfilesCreate = React.lazy(() => import('./views/Profiles/createProfile'));
 const YandexDirect = React.lazy(() => import('./views/YandexDirect'));
 const CreateCompany = React.lazy(() => import('./views/YandexDirect/createCompany/CreateCompany'));
-const Leads = React.lazy(() => import('./views/Leads/Leads'));
+const Leads = React.lazy(() => import('./views/Leads'));
 
 // https://github.com/ReactTraining/react-router/tree/master/packages/react-router-config
 const routes = [

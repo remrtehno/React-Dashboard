@@ -1,6 +1,6 @@
 import React, {useEffect, useState} from 'react';
 import { Table, Row, Col, Container, Button, Input, Label } from 'reactstrap';
-import { useCompaniesApi, changeCompanyStatusApi } from "./useYandexDirectApi";
+import { get, post } from '../../api';
 import { Link } from 'react-router-dom';
 import Select from 'react-select';
 
@@ -18,19 +18,20 @@ const changeCompanyStatus = (row, status, allCompanies, setAllCompanies) => {
   const newCompanyStatus = status === 'start' ? 'on' : 'off';
 
   if (newCompanyStatus !== row.state) {
-    changeCompanyStatusApi(row.id, status).then(success => {
-      if (success) {
-        const newCompanies = allCompanies.map(company => {
-          if (company.id === row.id) {
-            return {...company, state: newCompanyStatus};
-          }
+    post(`/api/yandex-direct/campaigns/${row.id}/${status}`)
+      .then(res => {
+        if (res.status === 200) {
+          const newCompanies = allCompanies.map(company => {
+            if (company.id === row.id) {
+              return {...company, state: newCompanyStatus};
+            }
 
-          return company
-        });
+            return company
+          });
 
-        setAllCompanies(newCompanies)
-      }
-    })
+          setAllCompanies(newCompanies)
+        }
+      });
   }
 };
 
@@ -214,7 +215,7 @@ const filterCompanies = (rows, filters) => {
 };
 
 const Component = () => {
-  const [getAllCompanies, load, setAllCompanies] = useCompaniesApi();
+  const [allCompanies, setAllCompanies] = useState([]);
   const [filters, setFilters] = useState({
     company: 'Все',
     region: 'Все',
@@ -222,17 +223,18 @@ const Component = () => {
   });
 
   useEffect(() => {
-    load();
+    get('/api/yandex-direct/campaigns').then(res => {
+      if (res && res.items) setAllCompanies(res.items)
+    })
   }, []);
 
-  console.log(getAllCompanies)
-
-  const filteredCompanies = filterCompanies(getAllCompanies, filters);
+  const filteredCompanies = filterCompanies(allCompanies, filters);
 
   return (
-    <Container>
+    <Container fluid={true}>
       <Row className='mb-3'>
-        <Col className='d-flex flex-row-reverse'>
+        <Col className='d-flex justify-content-between'>
+          <h2>Yandex direct</h2>
           <Link to='/yandex-direct/create-company'>
             <Button className='bg-turquoise-button text-white'>
               Новая кампания +
@@ -245,31 +247,31 @@ const Component = () => {
           Кампании
           <Select
             closeMenuOnSelect={true}
-            options={calcOptions(getAllCompanies)}
+            options={calcOptions(allCompanies)}
             onChange={ (selected) => setFilters({...filters, company: selected.value}) }
-            defaultValue={calcOptions(getAllCompanies)[0]}
+            defaultValue={calcOptions(allCompanies)[0]}
           />
         </Col>
         <Col>
           Города
           <Select
             closeMenuOnSelect={true}
-            options={calcOptions(getAllCompanies, 'regions')}
+            options={calcOptions(allCompanies, 'regions')}
             onChange={ (selected) => setFilters({...filters, region: selected.value}) }
-            defaultValue={calcOptions(getAllCompanies, 'regions')[0]}
+            defaultValue={calcOptions(allCompanies, 'regions')[0]}
           />
         </Col>
         <Col>
           Профили
           <Select
             closeMenuOnSelect={true}
-            options={calcOptions(getAllCompanies, 'profiles')}
+            options={calcOptions(allCompanies, 'profiles')}
             onChange={ (selected) => setFilters({...filters, profile: selected.value}) }
-            defaultValue={calcOptions(getAllCompanies, 'profiles')[0]}
+            defaultValue={calcOptions(allCompanies, 'profiles')[0]}
           />
         </Col>
         <Col>
-          <Label>
+          <Label className='w-100'>
             Начало периода
             <Input
               type="date"
@@ -278,7 +280,7 @@ const Component = () => {
           </Label>
         </Col>
         <Col>
-          <Label>
+          <Label className='w-100'>
             Конец периода
             <Input
               type="date"
@@ -302,7 +304,7 @@ const Component = () => {
           </tr>
         </thead>
         <tbody>
-          {renderTableRows(filteredCompanies, getAllCompanies, setAllCompanies)}
+          {renderTableRows(filteredCompanies, allCompanies, setAllCompanies)}
         </tbody>
       </Table>
     </Container>

@@ -12,7 +12,7 @@ import {
   FormFeedback,
   CustomInput,
 } from "reactstrap";
-import {useCardsApi, uploadImageApi, uploadCardsApi, useImageByIdApi} from "../useYandexDirectApi";
+import {post, get, getImagesByIdsApi} from '../../../api';
 
 const handleDeleteTemplate = (cards, index, setCards) => {
   if (cards.templates.length > 1) {
@@ -204,15 +204,17 @@ const uploadCards = async (cards, selectedImages, uploadedImages, setAdTexts, se
 
         return data
       })
-      .map(formData => uploadImageApi(formData)));
+      .map(formData => post('/api/images', formData)));
 
+  const uploadedImageIds = imagesToUpload.map(img => img.data);
 
-  cardsToUpload.imageIds = [...cardsToUpload.imageIds, ...imagesToUpload];
+  cardsToUpload.imageIds = [...cardsToUpload.imageIds, ...uploadedImageIds];
 
   if (cardsToUpload.imageIds.length === selectedImages.length) {
-    uploadCardsApi(cardsToUpload).then(res => {
-      setAdTexts(res.adTexts);
-    })
+    post('/api/yandex-direct/creation-wizard/ad-previews', cardsToUpload)
+      .then(res => {
+        setAdTexts(res.data.adTexts);
+      })
   }
 };
 
@@ -225,13 +227,19 @@ const Component = ({setStep, setAdTexts, selectedCity, selectedProfiles}) => {
   });
   const [selectedImages, setSelectedImages] = useState([]);
   const [uploadedImages, setUploadedImages] = useState([]);
+  const [allCards, setAllCards] = useState([]);
 
-  const [allCards, loadCards] = useCardsApi();
-  const [images, loadImages] = useImageByIdApi();
+  const [images, loadImages] = getImagesByIdsApi();
 
   useEffect(() => {
     const selectedProfileIds = selectedProfiles.map(prof => prof.id);
-    loadCards(selectedCity.id, selectedProfileIds);
+    get(
+      '/api/yandex-direct/creation-wizard/ad-text-templates',
+      {
+        RegionId: selectedCity.id,
+        ProfileIds: selectedProfileIds + ''
+      }
+    ).then(res => res && setAllCards(res))
   }, []);
 
   if (allCards.templates && cards.templates && !cards.templates.length) {

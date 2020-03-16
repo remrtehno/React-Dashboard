@@ -4,7 +4,7 @@ import {debounce} from 'lodash';
 import {Col, Row, Input} from "reactstrap";
 import Select from 'react-select';
 
-import get from '../../api/useGetRequest';
+import {get} from '../../api';
 
 const getAllState = async () => {
   const leads = await get('/api/leads'),

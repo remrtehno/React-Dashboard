@@ -1,8 +1,8 @@
-import React, {useEffect} from 'react';
+import React, {useState, useEffect} from 'react';
 import Select from "react-select";
 import {Button, CustomInput, FormGroup} from "reactstrap";
 import {Link} from 'react-router-dom';
-import {useRegionsApi, useProfilesApi} from "../useYandexDirectApi";
+import {get} from '../../../api';
 
 const handleCheck = (e, profiles, selectedProfiles, setProfiles) => {
   const isChecked = e.currentTarget.checked;
@@ -20,11 +20,23 @@ const handleCheck = (e, profiles, selectedProfiles, setProfiles) => {
   }
 };
 
-const Component = ({selectedProfiles ,setStep, setCity, setProfiles}) => {
-  const [getAllRegions, loadRegions] = useRegionsApi();
-  const [getAllProfiles, loadProfiles] = useProfilesApi();
+const getProfilesByRegionId = (RegionId, setAllProfiles) => {
+  get('/api/yandex-direct/creation-wizard/profiles', {RegionId})
+    .then(res => {
+      res && setAllProfiles(res)
+    })
+};
 
-  useEffect(() => loadRegions(), []);
+const Component = ({selectedProfiles ,setStep, setCity, setProfiles}) => {
+  const [allRegions, setAllRegions] = useState([]);
+  const [allProfiles, setAllProfiles] = useState([]);
+
+  useEffect(() => {
+    get('/api/yandex-direct/creation-wizard/regions')
+      .then(res => {
+        res && setAllRegions(res)
+      })
+  }, []);
 
   const isFullSelectedProfiles = selectedProfiles.length >= 3;
 
@@ -41,9 +53,9 @@ const Component = ({selectedProfiles ,setStep, setCity, setProfiles}) => {
         closeMenuOnSelect={true}
         getOptionLabel={option => option.name}
         getOptionValue={option => option.id}
-        options={getAllRegions}
+        options={allRegions}
         onChange={(selected) => {
-          loadProfiles(selected.id);
+          getProfilesByRegionId(selected.id, setAllProfiles);
           setCity(selected)
         }}
       />
@@ -52,7 +64,7 @@ const Component = ({selectedProfiles ,setStep, setCity, setProfiles}) => {
       </span>
       <div className='d-flex flex-column w-100 mb-3'>
         {
-          getAllProfiles.map(profile => {
+          allProfiles.map(profile => {
             const isSelected = selectedProfiles.find(item => item.id === profile.id);
             return (
               <FormGroup key={profile.id}>
@@ -62,7 +74,7 @@ const Component = ({selectedProfiles ,setStep, setCity, setProfiles}) => {
                   label={profile.name}
                   id={profile.id}
                   value={profile.id}
-                  onChange={(e) => handleCheck(e, getAllProfiles, selectedProfiles, setProfiles)}
+                  onChange={(e) => handleCheck(e, allProfiles, selectedProfiles, setProfiles)}
                 />
               </FormGroup>
             )

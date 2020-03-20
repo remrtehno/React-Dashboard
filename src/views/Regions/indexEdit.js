@@ -121,39 +121,41 @@ const Reports = () => {
         <Col lg="12" className="mb-sm-5 mb-5">
           <h2 className="mb-4"> Список регионов </h2>
           <CardBody className="p-0">
-            <Table responsive striped hover>
+            <Table responsive hover>
+              <thead className='thead-dark'>
+                <tr>
+                  <th> Город </th>
+                  <th> Тип </th>
+                  <th> Utm </th>
+                  <th> Регион </th>
+                  <th> Действие </th>
+                </tr>
+              </thead>
               <tbody>
-              <tr>
-                <td> Город </td>
-                <td> Тип </td>
-                <td> Utm </td>
-                <td> Регион </td>
-                <td> Действие </td>
-              </tr>
-              {
-                _.map(loadRegions.items, (value, key) => {
-                  return (
-                    <tr key={key}>
-                      <td>{`${value.name}`}</td>
-                      <td>{`${value.nameDative}`}</td>
-                      <td>{`${value.utm}`}</td>
-                      <td  width="240">
-                        { value.yandexRegions.map( regions => {
-                          return regions.name + ', ';
-                        }) }
-                      </td>
-                      <td>
-                        <div className="row align-items-center">
-                          <Link to={`/regions/edit/${value.id}`} className="col-6">
-                            <Button block color="primary">Редактировать</Button>
-                          </Link>
-                          <Button className="col-6" onClick={ () => deleteRegion(value.id) } block color="primary">Удалить</Button>
-                        </div>
-                      </td>
-                    </tr>
-                  )
-                })
-              }
+                {
+                  _.map(loadRegions.items, (value, key) => {
+                    return (
+                      <tr key={key}>
+                        <td>{`${value.name}`}</td>
+                        <td>{`${value.nameDative}`}</td>
+                        <td>{`${value.utm}`}</td>
+                        <td  width="240">
+                          { value.yandexRegions.map( regions => {
+                            return regions.name + ', ';
+                          }) }
+                        </td>
+                        <td>
+                          <div className="d-flex">
+                            <Link to={`/regions/edit/${value.id}`} className="col-8">
+                              <Button block color="primary">Редактировать</Button>
+                            </Link>
+                            <Button className="col-4" onClick={ () => deleteRegion(value.id) } block color="primary">Удалить</Button>
+                          </div>
+                        </td>
+                      </tr>
+                    )
+                  })
+                }
               </tbody>
             </Table>
           </CardBody>

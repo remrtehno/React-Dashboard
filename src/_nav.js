@@ -33,23 +33,6 @@ export default {
       name: 'Регионы',
       url: '/regions',
       icon: 'icon-settings',
-      children: [
-        {
-          name: 'Просмотреть',
-          url: '/regions',
-          icon: 'icon-puzzle',
-        },
-        {
-          name: 'Добавить',
-          url: '/regions/create',
-          icon: 'icon-puzzle',
-        },
-        {
-          name: 'Редактировать',
-          url: '/regions/edit-page/',
-          icon: 'icon-puzzle',
-        }
-      ]
     },
     {
       name: 'Вакансии',

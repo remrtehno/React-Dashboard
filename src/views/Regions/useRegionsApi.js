@@ -64,7 +64,7 @@ export function useLocalRegions() {
 }
 
 export function usePutRegion() {
-  const apiLoad = (regionId, body) => {
+  const apiLoad = async (regionId, body) => {
     const token = localStorage.getItem('access_token');
     fetch(HOST_URL +`/api/regions/${regionId}/`, {
       method: 'PUT',

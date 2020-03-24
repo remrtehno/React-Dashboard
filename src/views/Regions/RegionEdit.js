@@ -1,107 +1,93 @@
 import React, {useEffect, useState} from 'react';
-import HOST_URL from "../../constants";
 import {Col, Row, Input, Button, Table} from "reactstrap";
 import Select from 'react-select';
 import _ from 'lodash';
+import {useHistory} from 'react-router-dom';
 
+import {get, del} from '../../api'
 import {usePutRegion} from './useRegionsApi';
 
-const RegionEdit = (props) => {
-  const regionId = props.match.params.id;
-  const [region, setRegion] = useState({});
-  const [allRegion, setAllRegion] = useState([]);
-  const [apiLoad] = usePutRegion();
+const edit = (value, field, setRegion) => {
+  setRegion(region => {
+    let newRegion =_.cloneDeep(region);
+    newRegion[field] = value;
+    return newRegion;
+  });
+};
 
-  const loadRegion = () => {
-    const token = localStorage.getItem('access_token');
-    fetch(HOST_URL +`/api/regions/${regionId}`, {
-      method: 'GET',
-      headers: {
-        'Accept': 'text/plain',
-        'Authorization': 'Bearer ' + token
-      },
-    }).then((result) => {
-      if (result.status === 200) {
-        return result.clone().json()
-      }
-    }).then((result) => {
-      setRegion(result);
-    });
-  };
+const editSelect = (regionFilter, setRegion) => {
+  const yandexRegions = _.map(regionFilter, ({value, id}) => {
+    return {name: value, id: id};
+  });
+  setRegion(region => ({...region, 'yandexRegions': yandexRegions }))
+};
 
-  const getAllRegions = (query = "") => {
-    if(query === " " || !query) return;
+const getAllRegions = (query = "", setAllRegion) => {
+  if(query === " " || !query) return;
 
-    const token = localStorage.getItem('access_token');
-    let url = new URL(HOST_URL +`/api/yandex-direct/regions`);
-    let params = {search: query};
-    Object.keys(params).forEach(key => url.searchParams.append(key, params[key]));
-
-    fetch(url, {
-      method: 'GET',
-      headers: {
-        'Accept': 'text/plain',
-        'Authorization': 'Bearer ' + token
-      },
-    }).then((result) => {
-      if (result.status === 200) {
-        return result.clone().json()
-      }
-    }).then((result) => {
+  let params = {search: query};
+  get('/api/yandex-direct/regions', params)
+    .then((result) => {
       setAllRegion(
         _.map(result.items, (value) => {
           return {value: value.name, label: value.name, id: value.id, };
         })
       );
     });
+};
 
-  };
+const deleteRegion = (regionId, history) => {
+  del(`/api/regions/${regionId}`)
+    .then(res => {
+      if (res) history.push('/regions')
+    })
+}
+
+const RegionEdit = (props) => {
+  let history = useHistory();
+  const regionId = props.match.params.id;
+  const [region, setRegion] = useState({});
+  const [allRegion, setAllRegion] = useState([]);
+  const [apiLoad] = usePutRegion();
 
   useEffect(() => {
-    loadRegion(regionId);
-    getAllRegions();
+    get(`/api/regions/${regionId}`)
+      .then(res => setRegion(res));
   }, []);
-
-
-  const edit = (value, key, key2 = null) => {
-    setRegion((oldArray) => {
-        if(key2) {
-          let obj = _.cloneDeep(oldArray);
-          obj[key][key2] = value;
-          return obj;
-        }
-        let obj =_.cloneDeep(oldArray);
-        obj[key] = value;
-        return obj;
-    });
-  };
-
-  const editSelect = (regionFilter) => {
-    const yandexRegions = _.map(regionFilter, ({value, id}) => {
-     return {name: value, id: id};
-    });
-    setRegion({...region, 'yandexRegions': yandexRegions });
-  };
-
 
   return (
     <div className="animated fadeIn">
       <Row>
         <Col lg="12" className="mb-0">
           <h2 className="mb-3"> Редактировать регион</h2>
-          <Table responsive striped hover className="mb-3">
+          <Table responsive hover className="mb-3">
             <tbody>
               <tr>
                 <td>Название:</td>
-                <td><Input onChange={(event) => { edit(event.target.value, 'name', null) } } value={region.name}  /></td>
+                <td>
+                  <Input
+                    onChange={event => edit(event.target.value, 'name', setRegion)}
+                    defaultValue={region.name}
+                  />
+                </td>
               </tr>
               <tr>
                 <td>Дательный падеж (где):</td>
-                <td> <Input onChange={(event) => { edit(event.target.value, 'nameDative', null) } } value={region.nameDative} /> </td>
+                <td>
+                  <Input
+                    onChange={event => edit(event.target.value, 'nameDative', setRegion)}
+                    defaultValue={region.nameDative}
+                  />
+                </td>
               </tr>
               <tr>
                 <td>Utm:</td>
-                <td><Input onChange={(event) => { edit(event.target.value, 'utm', null) } } value={region.utm}  /></td>
+                <td>
+                  <Input
+                    onChange={event => edit(event.target.value, 'utm', setRegion)}
+                    defaultValue={region.utm}
+                  />
+                </td>
               </tr>
             </tbody>
           </Table>
@@ -116,12 +102,28 @@ const RegionEdit = (props) => {
             isMulti
             closeMenuOnSelect={false}
             options={allRegion}
-            onInputChange={ (value) => { getAllRegions(value) } }
-            onChange={ (value) => { editSelect(value) }}
+            onInputChange={value => getAllRegions(value, setAllRegion)}
+            onChange={value => editSelect(value, setRegion)}
           />
-          <Button onClick={()=> apiLoad(regionId, region) }  color="primary">Сохранить</Button>
+          <div className='d-flex align-items-center'>
+            <Button
+              className='mr-2'
+              onClick={() => {
+                apiLoad(regionId, region)
+                  .then(() => history.push('/regions'))
+              }}
+              color="primary"
+            >
+              Сохранить
+            </Button>
+            <Button
+              onClick={() => deleteRegion(regionId, history)}
+              color='danger'
+            >
+              Удалить
+            </Button>
+          </div>
         </Col>
-
       </Row>
     </div>
   );

@@ -1,5 +1,5 @@
 import React, {useEffect, useState} from 'react';
-import {Col, Row, Button, Input, Modal, ModalBody} from "reactstrap";
+import {Col, Row, Button, Input} from "reactstrap";
 import _ from 'lodash';
 import Select from 'react-select';
 import Fuse from 'fuse.js';
@@ -12,7 +12,6 @@ const Component = () => {
   const [getAllVacancies, load] = useVacanciesApi();
   const [filters, setFilters] = useState({});
   const [fuseQuery, setFuseQuery] = useState(null);
-  const [modal, setModal] = useState({modal: false});
 
   useEffect(() => {
     load();
@@ -20,21 +19,19 @@ const Component = () => {
 
   let filteredVacancy = _.filter(getAllVacancies, filters);
   const fuse = new Fuse(filteredVacancy, { keys: ['name'] });
-  const toggle = () => {
-    setModal({modal: !modal.modal, });
-  };
+
 
   if(fuseQuery) {
     filteredVacancy = fuse.search(fuseQuery);
   }
 
   const getFields = (field) => {
-    if(getAllVacancies.length === 0) return []; 
+    if(getAllVacancies.length === 0) return [];
     return getAllVacancies.reduce( (result, object) => {
       (Array.isArray(result) || (result = []));
       if(result.find( name => name.value === object[field].name)) return result;
       result.push({value: object[field].name, label: object[field].name});
-      return result; 
+      return result;
     });
   };
 
@@ -45,61 +42,63 @@ const Component = () => {
           <Row>
             <Col className="flex-grow-0"><h2 className="mb-0"> Вакансии </h2></Col>
             <Col lg="3">
-              <Input onChange={ 
-                event => { 
+              <Input onChange={
+                event => {
                   if(event.target.value) {
                     const query = event.target.value.toString();
-                    setFuseQuery(query); 
+                    setFuseQuery(query);
                   } else {
-                    setFuseQuery(null); 
-                  }                
-                } 
+                    setFuseQuery(null);
+                  }
+                }
               }
               />
             </Col>
             <Col lg="2">
               <Select
-                    placeholder={"Статус"}
-                    closeMenuOnSelect={true}
-                    options={ [{value: 'active', label: 'Активные'}, {value: 'stopped', label: 'Неактивные'}, {value: null, label: 'Все'}] } 
-                    onChange={ 
-                      (value) => { 
-                        setFilters( (filters) => {
-                          if(value.value) {
-                            return {...filters, status: value.value};
-                          } else {
-                            delete filters.status;
-                            return {...filters};
-                          }
-                        }); 
-                      } 
-                    }/>
+                placeholder={"Статус"}
+                closeMenuOnSelect={true}
+                options={ [{value: 'active', label: 'Активные'}, {value: 'stopped', label: 'Неактивные'}, {value: null, label: 'Все'}] }
+                onChange={
+                  (value) => {
+                    setFilters(filters => {
+                      if(value.value) {
+                        return {...filters, status: value.value};
+                      } else {
+                        delete filters.status;
+                        return {...filters};
+                      }
+                    });
+                  }
+                }
+              />
             </Col>
             <Col lg="2">
               <Select
-                  placeholder={"Регион"}
-                  closeMenuOnSelect={true}
-                  options={ [...getFields('region'), {value: null, label: 'Все'} ] } 
-                  onChange={ 
-                    (value) => { 
-                      setFilters( (filters) => {
-                        if(value.value) {
-                          return {...filters, region: {name: value.value}};
-                        } else {
-                          delete filters.region;
-                          return {...filters};
-                        }
-                      }); 
-                    } 
-                  }/>
+                placeholder={"Регион"}
+                closeMenuOnSelect={true}
+                options={ [...getFields('region'), {value: null, label: 'Все'} ] }
+                onChange={
+                  (value) => {
+                    setFilters( (filters) => {
+                      if(value.value) {
+                        return {...filters, region: {name: value.value}};
+                      } else {
+                        delete filters.region;
+                        return {...filters};
+                      }
+                    });
+                  }
+                }
+              />
             </Col>
             <Col lg="2">
               <Select
                 placeholder={"Профиль"}
                 closeMenuOnSelect={true}
-                options={ [ ...getFields('profile'), {value: null, label: 'Все'}] } 
-                onChange={ 
-                  (value) => { 
+                options={ [ ...getFields('profile'), {value: null, label: 'Все'}] }
+                onChange={
+                  (value) => {
                     setFilters( (filters) => {
                       if(value.value) {
                         return {...filters, profile: {name: value.value}};
@@ -107,8 +106,8 @@ const Component = () => {
                         delete filters.profile;
                         return {...filters};
                       }
-                    }); 
-                  } 
+                    });
+                  }
                 }/>
             </Col>
             <Col lg="1">
@@ -121,86 +120,96 @@ const Component = () => {
             {
               _.map(filteredVacancy, (value, key) => {
                 return (
-                  <Link key={key} className="vacancy" to={`vacancy/${value.id}`} >
+                  <div key={key} className="vacancy">
                     <div className="d-flex justify-content-between">
                       <div className="name">
                         {`${value.name}`}, {`${value.region.name}`}
                         {_.map(value.profile.externalIds, field => { return field.system })}
                       </div>
-                      <div>
-                          <Link to={`/vacancy/edit/${value.id}`} >
-                            <Button color="primary">Редактировать</Button>
-                          </Link>
+                      <div className='d-flex flex-column align-items-end'>
+                        <Link
+                          className='mb-2'
+                          to={`/vacancy/edit/${value.id}`}
+                        >
+                          <Button color="primary">Редактировать</Button>
+                        </Link>
+                        <Link to={`vacancy/${value.id}`}>
+                          <Button color="primary">Подробнее</Button>
+                        </Link>
                       </div>
                     </div>
 
                       <div className="d-inline-block align-top mr-5">
                         <table cellPadding="2">
-                          <tr>
-                            <td>
-                              <div className="vacancy-field">
-                                <b>Профиль:</b> 
-                              </div>
-                            </td>
-                            <td>
-                              {`${value.profile.name}`}
-                            </td>
-                          </tr>
-                          <tr>
-                            <td>
-                              <div className="vacancy-field">
-                                <b>Регион:</b> 
-                              </div>
-                            </td>
-                            <td>{`${value.region.name}`}</td>
-                          </tr>
-                          <tr>
-                            <td>
-                              <div className="vacancy-field">
-                                <b>Статус:</b> 
-                              </div>
-                            </td>
-                            <td>{`${value.status}`}</td>
-                          </tr>
+                          <tbody>
+                            <tr>
+                              <td>
+                                <div className="vacancy-field">
+                                  <b>Профиль:</b>
+                                </div>
+                              </td>
+                              <td>
+                                {`${value.profile.name}`}
+                              </td>
+                            </tr>
+                            <tr>
+                              <td>
+                                <div className="vacancy-field">
+                                  <b>Регион:</b>
+                                </div>
+                              </td>
+                              <td>{`${value.region.name}`}</td>
+                            </tr>
+                            <tr>
+                              <td>
+                                <div className="vacancy-field">
+                                  <b>Статус:</b>
+                                </div>
+                              </td>
+                              <td>{`${value.status}`}</td>
+                            </tr>
+                          </tbody>
                         </table>
                       </div>
                       <div className="d-inline-block align-top">
                         <table cellPadding="2">
-                          <tr>
-                            <td>
-                              <div className="vacancy-field">
-                                <b>Кампаний:</b> 
-                              </div>
-                            </td>
-                            <td>0</td>
-                          </tr>
-                          <tr>
-                            <td>
-                              <div className="vacancy-field">
-                                <b>Просмотров сегодня:</b> 
-                              </div>
-                            </td>
-                            <td>0</td>
-                          </tr>
-                          <tr>
-                            <td>
-                              <div className="vacancy-field">
-                                <b>Отликов сегодня:</b> 
-                              </div>
-                            </td>
-                            <td>0</td>
-                          </tr>
-                          <tr>
-                            <td>
-                              <div className="vacancy-field">
-                                <b>Интервью сегодня:</b> 
-                              </div>
-                            </td>
-                            <td>0</td>
-                          </tr>
+                          <tbody>
+                            <tr>
+                              <td>
+                                <div className="vacancy-field">
+                                  <b>Кампаний:</b>
+                                </div>
+                              </td>
+                              <td>0</td>
+                            </tr>
+                            <tr>
+                              <td>
+                                <div className="vacancy-field">
+                                  <b>Просмотров сегодня:</b>
+                                </div>
+                              </td>
+                              <td>0</td>
+                            </tr>
+                            <tr>
+                              <td>
+                                <div className="vacancy-field">
+                                  <b>Отликов сегодня:</b>
+                                </div>
+                              </td>
+                              <td>0</td>
+                            </tr>
+                            <tr>
+                              <td>
+                                <div className="vacancy-field">
+                                  <b>Интервью сегодня:</b>
+                                </div>
+                              </td>
+                              <td>0</td>
+                            </tr>
+                          </tbody>
                         </table>
                       </div>
-                  </Link>
+                  </div>
                 )
               })
             }

@@ -43,7 +43,7 @@ const renderCard = (cards, setCards) => {
     return (
       <Col md='6' key={index + 'key'}>
         <Card>
-          <CardHeader>
+          <CardHeader className='d-flex justify-content-between'>
             Объявление #{index+1}
             <div className="template-header-actions">
               <button

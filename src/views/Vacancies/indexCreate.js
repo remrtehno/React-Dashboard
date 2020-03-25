@@ -1,172 +1,278 @@
 import React, {useEffect, useState} from 'react';
-import HOST_URL from "../../constants";
-import {Col, Row, Input, Button, Table, CardBody, Modal, ModalHeader, ModalBody, ModalFooter} from "reactstrap";
+import {
+  Col,
+  Row,
+  Input,
+  Button,
+  Modal,
+  ModalBody,
+  FormGroup,
+  FormFeedback,
+  Table,
+} from "reactstrap";
 import _ from 'lodash';
 import Select from 'react-select'
+import {useHistory} from 'react-router-dom';
 
 import {useLocalRegions} from '../Regions/useRegionsApi';
-import useProfilesApi from "../Profiles/useProfilesApi";
-import usePostVacancies, {useVacanciesApi, deleteVacancyApi} from "./useVacanciesApi";
-import {Link} from "react-router-dom";
+import {get, post} from '../../api';
 
-const Component = () => {
+const toggle = (setModal) => {
+  setModal(modal => !modal);
+};
 
-  const [allRegion, searchField, loadRegionsAll] = useLocalRegions();
-  const [profiles, loadProfiles, allProfiles] = useProfilesApi();
-  const [modal, setModal] = useState({modal: false});
-  const [prices, setPrices] = useState({currency: 'Rub', from: '0', to: '0'});
-  const [externalIds, setExternalIds] = useState({});
-  const [vacancy, setVacancy] = useState({
-    "region": {
-      "id": "string",
-      "name": "string"
-    },
-    "profile": {
-      "id": "string",
-      "name": "string"
-    },
-    "name": "string",
-    "salary": {
-      "from": 0,
-      "to": 0,
-      "currency": "Rub"
-    },
-    "openPositions": 0,
-    "externalIds": [],
-    "status": "Active",
-    "tenantId": 0
+const addExternalIds = (newExternalId, setVacancy) => {
+  setVacancy(vacancy => {
+    let newVacancy = _.cloneDeep(vacancy);
+    if (!vacancy.externalIds) {
+      newVacancy.externalIds = [{...newExternalId}]
+    } else {
+      newVacancy.externalIds = [...newVacancy.externalIds, {...newExternalId}]
+    }
+
+    return newVacancy
+  })
+};
+
+const uploadVacancy = (vacancy, setInvalidFields, history) => {
+  const requiredFields = ['region', 'profile', 'name'];
+  let invalidFields = [];
+
+  if (!vacancy.salary || !vacancy.salary.from) invalidFields.push('salary');
+
+  requiredFields.forEach(field => {
+    if (_.isEmpty(vacancy[field])) invalidFields.push(field)
   });
 
-  const toggle = () => {
-    setModal({modal: !modal.modal, });
-  };
+  if (invalidFields.length) {
+    setInvalidFields(invalidFields);
+  } else {
+    post('/api/vacancies', vacancy)
+      .then(res => {
+        if (res && res.status === 200) {
+          history.push('/vacancies')
+        }
+      })
+  }
+};
+
+const renderExternalIdsTable = (vacancy, setVacancy) => {
+  if (vacancy.externalIds && vacancy.externalIds.length) {
+    return (
+      <Col lg="12">
+        <Table className='table table-sm'>
+          <thead>
+          <tr className='table-secondary'>
+            <td> System </td>
+            <td> ID </td>
+            <td/>
+          </tr>
+          </thead>
+          <tbody>
+            {
+              vacancy.externalIds.map((item, index) => {
+                return (
+                  <tr key={item.id + index}>
+                    <td> {item.system} </td>
+                    <td
+                      style={{maxWidth: '100px'}}
+                      className='text-truncate'
+                    >
+                      {item.id}
+                    </td>
+                    <td className='text-right'>
+                      <i
+                        className='cui-trash icon text-danger cursor-pointer'
+                        onClick={() => deleteExternalId(setVacancy, item.id)}
+                      />
+                    </td>
+                  </tr>
+                )
+              })
+            }
+          </tbody>
+        </Table>
+      </Col>
+    )
+  }
+}
+
+const deleteExternalId = (setVacancy, selectedId) => {
+  setVacancy(vacancy => {
+    const filteredExternalIds = vacancy.externalIds.filter(item => item.id !== selectedId);
+    return {...vacancy, externalIds: filteredExternalIds}
+  })
+};
+
+const Component = () => {
+  let history = useHistory();
+  const [allRegion, searchField, loadRegionsAll] = useLocalRegions();
+  const [allProfiles, setProfiles] = useState([]);
+
+  const [invalidFields, setInvalidFields] = useState([]);
+  const [modal, setModal] = useState(false);
+  const [newExternalId, setNewExternalId] = useState({});
+  const [vacancy, setVacancy] = useState({
+    salary: {
+      currency: 'Rub'
+    },
+    status: 'Active'
+  });
 
   useEffect(() => {
-    loadProfiles();
+    get('/api/profiles')
+      .then(res => setProfiles(res.items));
     loadRegionsAll();
   }, []);
 
-  console.log(searchField);
+  useEffect(() => {
+    let newInvalidFields = [...invalidFields];
 
-  const selectRegion = (selected) => {
-    _.forEach(allRegion, ({name, id}) => {
-      if( selected.value === name ) {
-        setVacancy( oldArray => {
-          let obj = Object.assign({}, oldArray);
-          obj.region = {"name": name, "id": id };
-          return obj;
-        });
+    const isFilledSalaryField = vacancy.salary && !_.isEmpty(vacancy.salary.from);
+    if (isFilledSalaryField) {
+      newInvalidFields = newInvalidFields.filter(field => field !== 'salary');
+    }
+
+    invalidFields.forEach(field => {
+      const isFilledField = vacancy[field] && !_.isEmpty(vacancy[field]);
+      if (isFilledField) {
+        newInvalidFields = newInvalidFields.filter(f => field !== f)
       }
     });
-  };
 
+    setInvalidFields(newInvalidFields)
+  }, [vacancy]);
 
-  const selectProfile = (selected) => {
-    _.forEach(allProfiles, ({name, id}) => {
-      if( selected.value === name ) {
-        setVacancy( oldArray => {
-          let obj = Object.assign({}, oldArray);
-          obj.profile = {"name": name, "id": id };
-          return obj;
-        });
-      }
-    });
-  };
-
-  const setName = (value) => {
-    console.log(value);
-    setVacancy( oldArray => {
-      let obj = Object.assign({}, oldArray);
-      obj.name = value;
-      return obj;
-    } );
-  };
-
-  const setOpenPositions = (value) => {
-    setVacancy( oldArray => {
-      let obj = Object.assign({}, oldArray);
-      obj.openPositions = Number(value);
-      return obj;
-    } );
-  };
-  const setStatus = (value) => {
-    setVacancy( oldArray => {
-      let obj = Object.assign({}, oldArray);
-      obj.status = value;
-      return obj;
-    } );
-  };
-
-
-  const setPrice = (val, property) => {
-    setPrices( (oldArray) => {
-      let obj = Object.assign({}, oldArray);
-      obj[property] = Number(val);
-      return obj;
-    });
-  };
-
-  const addExternarIds = (value, key) => {
-    setExternalIds( (oldArray) => {
-      let obj = Object.assign({}, oldArray);
-      obj[key] = value;
-      return obj;
-    });
-  };
-
-  const addToVacancy = (value, key) => {
-    setVacancy( oldArray => {
-      let obj = Object.assign({}, oldArray);
-      obj[key].push(value);
-      return obj;
-    });
-  };
-
-  vacancy.salary = {"currency": prices.currency, from: prices.from, to: prices.to,};
-
-  const [sendVacancy] = usePostVacancies();
-
-  const [getAllVacancies, load] = useVacanciesApi();
-  const [deleteVacancy] = deleteVacancyApi();
-
+  if (!modal && !_.isEmpty(newExternalId)) setNewExternalId({});    // clear externalId when close modal
 
   return (
     <div className="animated fadeIn">
       <Row>
-        <Col lg="12" className="mb-3">  <h2> Сохранить в базу </h2> </Col>
+        <Col lg="12" className="mb-3">
+          <h2> Сохранить в базу </h2>
+        </Col>
         <Col lg="6" className="mb-3">
-          <h5>  Регион </h5>
-          <Select
-            closeMenuOnSelect={true}
-            options={ searchField }
-            onChange={ (value) => { selectRegion(value) } } />
+          <h5> Регион </h5>
+          <div>
+            <Select
+              className={invalidFields.includes('region') && 'border rounded border-danger'}
+              closeMenuOnSelect={true}
+              options={searchField}
+              onChange={value => setVacancy({
+                ...vacancy,
+                region: {
+                  id: value.id,
+                  name: value.label
+                }
+              })}
+            />
+            <div
+              className={`invalid-feedback ${invalidFields.includes('region') && 'd-block'}`}
+            >
+              Поле обязательное для заполнения
+            </div>
+          </div>
         </Col>
         <Col lg="6" className="mb-3">
           <h5> Профиль </h5>
-          <Select
-            closeMenuOnSelect={true}
-            options={ profiles }
-            onChange={ (value) => { selectProfile(value) } } />
+          <div>
+            <Select
+              className={invalidFields.includes('profile') && 'border rounded border-danger'}
+              closeMenuOnSelect={true}
+              options={allProfiles}
+              getOptionLabel={option => option.name}
+              getOptionValue={option => option.id}
+              onChange={value => setVacancy({
+                ...vacancy,
+                profile: {
+                  id: value.id,
+                  name: value.name
+                }
+              })}
+            />
+            <div
+              className={`invalid-feedback ${invalidFields.includes('profile') && 'd-block'}`}
+            >
+              Поле обязательно для заполнения
+            </div>
+          </div>
         </Col>
         <Col lg="6" className="mb-3">
           <h5> Название вакансии </h5>
-          <Input type="text" onChange={(event) => { setName(event.target.value ) } } />
+          <FormGroup>
+            <Input
+              invalid={invalidFields.includes('name')}
+              type="text"
+              onChange={event => setVacancy({
+                ...vacancy,
+                name: event.target.value
+              })}
+            />
+            <FormFeedback>
+              Поле обязательно для заполнения
+            </FormFeedback>
+          </FormGroup>
         </Col>
         <Col lg="6" className="mb-3">
           <h5> Количество открытых вакансий </h5>
-          <Input type="text" onChange={(event) => { setOpenPositions(event.target.value ) } } />
+          <Input
+            type="number"
+            onChange={event => setVacancy({
+              ...vacancy,
+              openPositions: +event.target.value
+            })}
+          />
         </Col>
         <Col lg="12" className="mb-3">
           <h5> Зарплата </h5>
           <Row>
-            <Col lg="5" className="mb-3"> <Input type="text" onChange={(event) => { setPrice(event.target.value, 'from' )}} placeholder={'От'} /> </Col>
-            <Col lg="5" className="mb-3"> <Input type="text" onChange={(event) => { setPrice(event.target.value, 'to')}} placeholder={'До'} /> </Col>
+            <Col lg="5" className="mb-3">
+              <FormGroup>
+                <Input
+                  invalid={invalidFields.includes('salary')}
+                  type="number"
+                  placeholder='От'
+                  min='4'
+                  onChange={event => setVacancy({
+                    ...vacancy,
+                    salary: {
+                      ...vacancy.salary,
+                      from: +event.target.value
+                    }
+                  })}
+                />
+                <FormFeedback>
+                  Поле обязательно для заполнения
+                </FormFeedback>
+              </FormGroup>
+            </Col>
+            <Col lg="5" className="mb-3">
+              <Input
+                type="text"
+                placeholder='До'
+                onChange={event => setVacancy({
+                  ...vacancy,
+                  salary: {
+                    ...vacancy.salary,
+                    to: +event.target.value
+                  }
+                })}
+              />
+            </Col>
             <Col lg="2" className="mb-3">
               <Select
                 placeholder={"Rub"}
                 closeMenuOnSelect={true}
-                options={ [{value: 'Rub', label: 'Rub'}, {value: '$', label: '$'}] }
-                onChange={ (value) => { setPrice(value.value, 'currency' ) } } />
+                defaultValue={{value: 'Rub', label: 'Rub'}}
+                options={ [{value: 'Rub', label: 'Rub'}, {value: 'Usd', label: 'Usd'}, {value: 'Eur', label: 'Eur'}] }
+                onChange={value => setVacancy({
+                  ...vacancy,
+                  salary: {
+                    ...vacancy.salary,
+                    currency: value.value
+                  }
+                })}
+              />
             </Col>
           </Row>
         </Col>
@@ -174,26 +280,55 @@ const Component = () => {
           <h5> Статус вакансии </h5>
           <Select
             closeMenuOnSelect={true}
+            defaultValue={{value: 'Active', label: 'Активная'}}
             options={ [{value: 'Active', label: 'Активная'}, {value: 'Stopped', label: 'Остановленная'}] }
-            onChange={ (value) => { setStatus(value.value) } } />
+            onChange={status => setVacancy({
+              ...vacancy,
+              status: status.value
+            })}
+          />
+          <Button
+            className="mt-3"
+            onClick={() => uploadVacancy(vacancy, setInvalidFields, history)}
+          >
+            Отправить
+          </Button>
         </Col>
         <Col lg="6" className="mb-3">
           <h5> Внешние ID </h5>
-          <Button onClick={toggle} className="mr-1">Добавить</Button>
-          <Modal isOpen={modal.modal} toggle={toggle} >
+          <Row>
+            {renderExternalIdsTable(vacancy, setVacancy)}
+            <Col lg="6">
+              <Button onClick={() => toggle(setModal)} className="mr-1">Добавить</Button>
+            </Col>
+          </Row>
+          <Modal isOpen={modal} toggle={() => toggle(setModal)} >
             <ModalBody>
-              <Input className="mb-3" type="text" onChange={(event) => { addExternarIds(event.target.value, 'id') } } placeholder={'ID'} />
+              <Input
+                className="mb-3"
+                type="text"
+                onChange={e => setNewExternalId({...newExternalId, id: e.target.value})}
+                placeholder='ID'
+              />
               <Select
                 className="mb-3"
                 placeholder={"System"}
                 closeMenuOnSelect={true}
-                options={ [{value: 'Skillaz', label: 'Skillaz'}, {value: 'SF', label: 'SF'}] }
-                onChange={ (value) => { addExternarIds(value.value, 'system')} } />
-              <Button disabled={_.isEmpty(externalIds)} onClick={ () => { addToVacancy(externalIds, 'externalIds'); toggle(); }} className="mr-1">Добавить</Button>
+                options={ [{value: 'Skillaz', label: 'Skillaz'}, {value: 'SuccessFactors', label: 'SuccessFactors'}] }
+                onChange={value => setNewExternalId({...newExternalId, system: value.value})} />
+              <Button
+                disabled={_.isEmpty(newExternalId)}
+                onClick={() => {
+                  addExternalIds(newExternalId, setVacancy);
+                  toggle(setModal);
+                }}
+                className="mr-1"
+              >
+                Добавить
+              </Button>
             </ModalBody>
           </Modal>
         </Col>
-        <Col lg="6" className="mb-5"> <Button onClick={ () => sendVacancy(vacancy) } className="mr-1">Отправить</Button> </Col>
       </Row>
     </div>
   );

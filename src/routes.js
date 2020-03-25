@@ -44,7 +44,6 @@ const RegionEdit = React.lazy(() => import('./views/Regions/RegionEdit'));
 const RegionDetail = React.lazy(() => import('./views/Regions/RegionDetail'));
 const RegionsIndexCreate = React.lazy(() => import('./views/Regions/indexCreate'));
 const Vacancies = React.lazy(() => import('./views/Vacancies/'));
-const VacanciesEdit = React.lazy(() => import('./views/Vacancies/indexEdit'));
 const VacancyEdit = React.lazy(() => import('./views/Vacancies/VacancyEdit'));
 const VacanciesCreate = React.lazy(() => import('./views/Vacancies/indexCreate'));
 const VacancyDetail = React.lazy(() => import('./views/Vacancies/VacancyDetail'));
@@ -109,7 +108,6 @@ const routes = [
   { path: '/regions/edit/:id', name: 'Редактировать Регион', component: RegionEdit },
   { path: '/vacancies', exact: true, name: 'Вакансии', component: Vacancies },
   { path: '/vacancies/create', exact: true, name: 'Вакансии', component: VacanciesCreate },
-  { path: '/vacancies/edit', exact: true, name: 'Вакансии', component: VacanciesEdit },
   { path: '/vacancy/edit/:id', exact: true, name: 'Вакансии', component: VacancyEdit },
   { path: '/vacancy/:id', exact: true, name: 'Вакансии', component: VacancyDetail },
   { path: '/profiles/', exact: true, name: 'Профили', component: Profiles },

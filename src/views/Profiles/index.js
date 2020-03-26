@@ -52,14 +52,17 @@ const Component = () => {
           {
             _.map(filteredProfile, (value, key) => {
               return (
-                <Link key={key} className="vacancy" to={`/profile/${value.id}`} >
+                <div key={key} className="vacancy">
                   <div className="d-flex justify-content-between">
                     <div className="name">
                       {`${value.name}`}
                     </div>
-                    <div>
-                      <Link to={`/profile/edit/${value.id}`} >
-                        <Button color="primary">Редактировать</Button>
+                    <div className='d-flex flex-column align-items-end'>
+                      <Link to={`/profile/edit/${value.id}`} className='mb-2'>
+                        <Button color="primary"> Редактировать </Button>
+                      </Link>
+                      <Link to={`/profile/${value.id}`}>
+                        <Button color="primary"> Подробнее </Button>
                       </Link>
                     </div>
                   </div>
@@ -67,44 +70,48 @@ const Component = () => {
                   <Col lg="4">
                   <div className="d-inline-block align-top table-top-align-row">
                     <table cellPadding="2">
-                      <tr>
-                        <td>
-                          <div className="vacancy-field">
-                            <b>Занятность:</b>
-                          </div>
-                        </td>
-                        <td>{`${value.employment}`}</td>
-                      </tr>
-                      <tr>
-                        <td>
-                          <div className="vacancy-field">
-                            <b>График:</b>
-                          </div>
-                        </td>
-                        <td>{`${value.schedule}`}</td>
-                      </tr>
+                      <tbody>
+                        <tr>
+                          <td>
+                            <div className="vacancy-field">
+                              <b>Занятность:</b>
+                            </div>
+                          </td>
+                          <td>{`${value.employment}`}</td>
+                        </tr>
+                        <tr>
+                          <td>
+                            <div className="vacancy-field">
+                              <b>График:</b>
+                            </div>
+                          </td>
+                          <td>{`${value.schedule}`}</td>
+                        </tr>
+                      </tbody>
                     </table>
                   </div>
                   </Col>
                   <Col lg="2">
                   <div className="d-inline-block align-top">
                     <table cellPadding="2">
-                      <tr>
-                        <td>
-                          <div className="vacancy-field">
-                            <b>Ключевики:</b>
-                          </div>
-                        </td>
-                        <td>0</td>
-                      </tr>
-                      <tr>
-                        <td>
-                          <div className="vacancy-field">
-                            <b>Просмотров сегодня:</b>
-                          </div>
-                        </td>
-                        <td>0</td>
-                      </tr>
+                      <tbody>
+                        <tr>
+                          <td>
+                            <div className="vacancy-field">
+                              <b>Ключевики:</b>
+                            </div>
+                          </td>
+                          <td>0</td>
+                        </tr>
+                        <tr>
+                          <td>
+                            <div className="vacancy-field">
+                              <b>Просмотров сегодня:</b>
+                            </div>
+                          </td>
+                          <td>0</td>
+                        </tr>
+                      </tbody>
                     </table>
                   </div>
                   </Col>
@@ -112,7 +119,7 @@ const Component = () => {
                     {`${value.description}`}
                   </Col>
                 </Row>
-                </Link>
+                </div>
               )
             })
           }

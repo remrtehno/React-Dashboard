@@ -1,22 +1,17 @@
 import React, {useEffect} from 'react';
 import {Col, Row, Button} from "reactstrap";
 import {Link} from "react-router-dom";
-
-
-import {useProfileApi} from "./useProfilesApi";
 import _ from "lodash";
 
+import {useProfileApi} from "./useProfilesApi";
 
 const Component = (props) => {
   const profileID = props.match.params.id;
   const [profile, loadApi] = useProfileApi();
 
-
   useEffect(() => {
     loadApi(profileID);
   }, []);
-
-  console.log(profile)
 
   return (
     <div className="animated fadeIn">
@@ -27,11 +22,6 @@ const Component = (props) => {
           <hr/>
         </Col>
         <Col lg="4" className="mb-3">
-          <div className="mb-3">
-            <h5>Внешние индетификаторы</h5>
-            { _.isEmpty(profile.externalIds) ? 'Не указаны' : "" }
-            { _.map(profile.externalIds, ({name, id}) => { return name+', '; }) }
-          </div>
           <div className="mb-3">
             <h5 className="mr-2 d-inline-block">Занятность</h5>
             { profile.employment }
@@ -44,9 +34,9 @@ const Component = (props) => {
             <h5 className="mr-2 mb-3">Задачи</h5>
             <div className="pl-4">
               { _.isEmpty(profile.tasks) ? 'Не указаны' : "" }
-              { _.map(profile.tasks, ({title, description}) => {
+              { _.map(profile.tasks, ({title, description}, index) => {
                 return (
-                  <div>
+                  <div key={index}>
                     <div className="mb-4">
                       <h6 className="m-0">{title}</h6>
                       {description}
@@ -59,13 +49,13 @@ const Component = (props) => {
         </Col>
         <Col lg="4" className="mb-3">
           <h5>Ключевые фразы</h5>
-          <div className="vertical-scroll">
+          <div className="vertical-scroll bg-transparent">
             { profile.keywords }
           </div>
         </Col>
         <Col lg="4" className="mb-3">
           <h5>Минус фразы</h5>
-          <div className="vertical-scroll">
+          <div className="vertical-scroll bg-transparent">
             { profile.negativeKeywords }
           </div>
         </Col>

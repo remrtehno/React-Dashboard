@@ -4,6 +4,7 @@ import * as router from 'react-router-dom';
 import { Container } from 'reactstrap';
 import HOST_URL from '../../constants/';
 
+import ErrorBoundary from "./ErrorBoundary";
 import {
   AppAside,
   AppFooter,
@@ -91,9 +92,11 @@ function DefaultLayout(props) {
                         exact={route.exact}
                         name={route.name}
                         render={props => (
-                          <route.component {...props} />
+                          <ErrorBoundary>
+                            <route.component {...props} />
+                          </ErrorBoundary>
                         )} />
-                    ) : (null);
+                    ) : null;
                   })}
                   <Redirect from="/" to="/dashboard" />
                 </Switch>

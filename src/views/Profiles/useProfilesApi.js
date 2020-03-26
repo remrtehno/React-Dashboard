@@ -52,11 +52,10 @@ export function useProfileApi() {
 }
 
 export function useProfileUpdate() {
-  const updateProfile = (id = 0, data) => {
-    console.log(window.ps = data);
-    if(!id) return;
+  const updateProfile = async (id = 0, data) => {
+    if(!id) return null;
     const token = localStorage.getItem('access_token');
-    fetch( `${HOST_URL}/api/profile/${id}`, {
+    return fetch( `${HOST_URL}/api/profile/${id}`, {
       method: 'put',
       headers: {
         'Accept': '*/*',
@@ -67,8 +66,8 @@ export function useProfileUpdate() {
     }).then((result) => {
       if (result.status === 200) {
         alert(result.status);
-        window.location.reload();
       }
+      return result
     });
   };
 
@@ -76,9 +75,9 @@ export function useProfileUpdate() {
 }
 
 export function useProfileCreate() {
-  const createProfile = (data) => {
+  const createProfile = async (data) => {
     const token = localStorage.getItem('access_token');
-    fetch( `${HOST_URL}/api/profiles/`, {
+    return fetch( `${HOST_URL}/api/profiles/`, {
       method: 'post',
       headers: {
         'Accept': '*/*',
@@ -89,8 +88,8 @@ export function useProfileCreate() {
     }).then((result) => {
       if (result.status === 200) {
         alert(result);
-        window.location.reload();
       }
+      return result;
     });
   };
 

@@ -30,14 +30,14 @@ function Login() {
       if(json.status === 500) return json.status;
       return json.json()
       }).then((result) => {
-        if (result === 500) {
-          alert('Invalid User');
-          console.log(userName,password)
-      } else {
+        if (result.token) {
           let expiresAt = JSON.stringify(( (7*24*60*60) * 1000) + new Date().getTime());
           localStorage.setItem('access_token', result.token);
           localStorage.setItem('expires_at', expiresAt);
           dashboard();
+        } else {
+          alert('Invalid User');
+          console.log(userName,password)
         }
       })
   };

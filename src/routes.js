@@ -54,6 +54,9 @@ const ProfilesCreate = React.lazy(() => import('./views/Profiles/createProfile')
 const YandexDirect = React.lazy(() => import('./views/YandexDirect'));
 const CreateCompany = React.lazy(() => import('./views/YandexDirect/createCompany/CreateCompany'));
 const Leads = React.lazy(() => import('./views/Leads'));
+const Images = React.lazy(() => import('./views/Images'));
+const ImageEdit = React.lazy(() => import('./views/Images/indexEdit'));
+const ImageCreate = React.lazy(() => import('./views/Images/indexCreate'));
 
 // https://github.com/ReactTraining/react-router/tree/master/packages/react-router-config
 const routes = [
@@ -115,8 +118,11 @@ const routes = [
   { path: '/profile/edit/:id', exact: true, name: 'Редактировать', component: ProfileEdit },
   { path: '/profiles/create', exact: true, name: 'Создать', component: ProfilesCreate },
   { path: '/yandex-direct', exact: true, name: 'Yandex direct', component: YandexDirect },
-  { path: '/yandex-direct/create-company', exact: true, name: 'Create company', component: CreateCompany },
-  { path: '/leads', exact: true, name: 'Leads', component: Leads },
+  { path: '/yandex-direct/create-company', exact: true, name: 'Новая кампания', component: CreateCompany },
+  { path: '/leads', exact: true, name: 'Лиды', component: Leads },
+  { path: '/images', exact: true, name: 'Справочник изображений', component: Images },
+  { path: '/images/edit/:id', exact: true, name: 'Редактирование изображения', component: ImageEdit},
+  { path: '/images/create', exact: true, name: 'Создание изображения', component: ImageCreate},
 ];
 
 export default routes;

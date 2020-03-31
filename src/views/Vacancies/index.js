@@ -35,6 +35,8 @@ const Component = () => {
     });
   };
 
+  console.log(getAllVacancies)
+
   return (
     <div className="animated fadeIn">
       <Row>

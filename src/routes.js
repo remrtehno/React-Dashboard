@@ -44,7 +44,6 @@ const RegionEdit = React.lazy(() => import('./views/Regions/RegionEdit'));
 const RegionDetail = React.lazy(() => import('./views/Regions/RegionDetail'));
 const RegionsIndexCreate = React.lazy(() => import('./views/Regions/indexCreate'));
 const Vacancies = React.lazy(() => import('./views/Vacancies/'));
-const VacanciesEdit = React.lazy(() => import('./views/Vacancies/indexEdit'));
 const VacancyEdit = React.lazy(() => import('./views/Vacancies/VacancyEdit'));
 const VacanciesCreate = React.lazy(() => import('./views/Vacancies/indexCreate'));
 const VacancyDetail = React.lazy(() => import('./views/Vacancies/VacancyDetail'));
@@ -55,6 +54,9 @@ const ProfilesCreate = React.lazy(() => import('./views/Profiles/createProfile')
 const YandexDirect = React.lazy(() => import('./views/YandexDirect'));
 const CreateCompany = React.lazy(() => import('./views/YandexDirect/createCompany/CreateCompany'));
 const Leads = React.lazy(() => import('./views/Leads'));
+const Images = React.lazy(() => import('./views/Images'));
+const ImageEdit = React.lazy(() => import('./views/Images/indexEdit'));
+const ImageCreate = React.lazy(() => import('./views/Images/indexCreate'));
 
 // https://github.com/ReactTraining/react-router/tree/master/packages/react-router-config
 const routes = [
@@ -109,7 +111,6 @@ const routes = [
   { path: '/regions/edit/:id', name: 'Редактировать Регион', component: RegionEdit },
   { path: '/vacancies', exact: true, name: 'Вакансии', component: Vacancies },
   { path: '/vacancies/create', exact: true, name: 'Вакансии', component: VacanciesCreate },
-  { path: '/vacancies/edit', exact: true, name: 'Вакансии', component: VacanciesEdit },
   { path: '/vacancy/edit/:id', exact: true, name: 'Вакансии', component: VacancyEdit },
   { path: '/vacancy/:id', exact: true, name: 'Вакансии', component: VacancyDetail },
   { path: '/profiles/', exact: true, name: 'Профили', component: Profiles },
@@ -117,8 +118,11 @@ const routes = [
   { path: '/profile/edit/:id', exact: true, name: 'Редактировать', component: ProfileEdit },
   { path: '/profiles/create', exact: true, name: 'Создать', component: ProfilesCreate },
   { path: '/yandex-direct', exact: true, name: 'Yandex direct', component: YandexDirect },
-  { path: '/yandex-direct/create-company', exact: true, name: 'Create company', component: CreateCompany },
-  { path: '/leads', exact: true, name: 'Leads', component: Leads },
+  { path: '/yandex-direct/create-company', exact: true, name: 'Новая кампания', component: CreateCompany },
+  { path: '/leads', exact: true, name: 'Лиды', component: Leads },
+  { path: '/images', exact: true, name: 'Справочник изображений', component: Images },
+  { path: '/images/edit/:id', exact: true, name: 'Редактирование изображения', component: ImageEdit},
+  { path: '/images/create', exact: true, name: 'Создание изображения', component: ImageCreate},
 ];
 
 export default routes;

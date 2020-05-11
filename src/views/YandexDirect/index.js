@@ -5,13 +5,34 @@ import { Link } from 'react-router-dom';
 import Select from 'react-select';
 
 const headers = [
-  'Кампания',
-  'Вакансии',
-  'Бюджет',
-  'Потрачено',
-  'Клики / CPC',
-  'Кандидаты / CPL',
-  'Интервью / CPA',
+  {label: 'Кампания'},
+  {label: 'Вакансии'},
+  {
+    label: 'Бюджет',
+    sortField: 'Budget'
+  },
+  {
+    label: 'Потрачено',
+    sortField: 'Cost'
+  },
+  {
+    label: 'Клики',
+    secondLabel: 'CPC',
+    sortField: 'Clicks',
+    secondSortField: 'Cpc'
+  },
+  {
+    label: 'Кандидаты',
+    secondLabel: 'CPL',
+    sortField: 'Candidates',
+    secondSortField: 'Cpl'
+  },
+  {
+    label: 'Интервью',
+    secondLabel: 'CPA',
+    sortField: 'Interviews',
+    secondSortField: 'Cpa'
+  }
 ];
 
 const changeCompanyStatus = (row, status, allCompanies, setAllCompanies) => {
@@ -214,6 +235,53 @@ const filterCompanies = (rows, filters) => {
   return filteredRows
 };
 
+const renderSortTriangle = (sortBy, sortField) => {
+  const isSortedField = sortField === sortBy.Sort;
+
+  if (isSortedField) {
+    if (sortBy.Direction === 'Asc') {
+      return (
+        <span className='ml-1'>
+          &#9650;
+        </span>
+      )
+    }
+    if (sortBy.Direction === 'Desc') {
+      return (
+        <span className='ml-1'>
+          &#9660;
+        </span>
+      )
+    }
+  }
+
+  return null
+};
+
+const sortCompanies = (sortField, setSortBy) => {
+  if (sortField) {
+    const isAscDirection = sortField === 'Cpc' ||
+      sortField === 'Cpl' ||
+      sortField === 'Cpa';
+
+    const defaultDirection = isAscDirection ? 'Asc' : 'Desc';
+
+    setSortBy(sortBy => {
+      let newDirection = defaultDirection;
+      if (sortBy.Sort === sortField) {
+        newDirection = sortBy.Direction === 'Desc' ? 'Asc' : 'Desc';
+      }
+
+      const newSortBy = {
+        Sort: sortField,
+        Direction: newDirection
+      };
+
+      return newSortBy
+    })
+  }
+};
+
 const Component = () => {
   const [allCompanies, setAllCompanies] = useState([]);
   const [filters, setFilters] = useState({
@@ -221,12 +289,21 @@ const Component = () => {
     region: 'Все',
     profile: 'Все'
   });
+  const [sortBy, setSortBy] = useState({
+    Sort: '',
+    Direction: ''
+  });
 
   useEffect(() => {
     get('/api/yandex-direct/campaigns').then(res => {
       if (res && res.items) setAllCompanies(res.items)
     })
   }, []);
+
+  useEffect(() => {
+    get('/api/yandex-direct/campaigns', sortBy)
+      .then(res => setAllCompanies(res.items))
+  }, [sortBy]);
 
   const filteredCompanies = filterCompanies(allCompanies, filters);
 
@@ -294,9 +371,31 @@ const Component = () => {
           <tr>
             {
               headers.map((header, index) => {
+                const isSortableCol = Boolean(header.sortField);
+                const colClass = isSortableCol ? 'cursor-pointer' : ' text-decoration-none';
+
                 return (
-                  <th key={index} className='bg-turquoise text-center'>
-                    {header}
+                  <th key={index} className='bg-turquoise'>
+                    <div>
+                      <u
+                        className={colClass}
+                        onClick={() => sortCompanies(header.sortField, setSortBy)}
+                      >
+                        {header.label}
+                        {header.sortField && renderSortTriangle(sortBy, header.sortField)}
+                      </u>
+                      {
+                        header.secondLabel && (
+                          <u
+                            className={colClass}
+                            onClick={() => sortCompanies(header.secondSortField, setSortBy)}
+                          >
+                            {' / ' + header.secondLabel}
+                            {renderSortTriangle(sortBy, header.secondSortField)}
+                          </u>
+                        )
+                      }
+                    </div>
                   </th>
                 )
               })

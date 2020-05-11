@@ -54,6 +54,8 @@ const renderAdverts = (adTexts, images) => {
     return adverts.map((advert, index) => {
       const width = imagePresizer(advert.image.data);
 
+      const src = `data:${advert.image.contentType};base64,${advert.image.data}`
+
       return (
         <div
           key={index+'key'}
@@ -61,7 +63,7 @@ const renderAdverts = (adTexts, images) => {
           style={{width: '426px', height: '128px', maxWidth: '426px'}}
         >
           <div className='mr-2 d-flex'>
-            <img src={advert.image.data} alt='error' className='img-fluid' style={{objectFit: 'cover', maxWidth: width+'px'}}/>
+            <img src={src} alt='error' className='img-fluid' style={{objectFit: 'cover', maxWidth: width+'px'}}/>
           </div>
           <div className='pt-2'>
             <h3 className='font-20px mb-0 text-dark-blue font-weight-bold'>

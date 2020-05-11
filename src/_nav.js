@@ -70,6 +70,11 @@ export default {
       name: 'Leads',
       url: '/leads',
       icon: 'icon-settings',
+    },
+    {
+      name: 'Справочник изображений',
+      url: '/images',
+      icon: 'icon-settings',
     }
   ],
 };

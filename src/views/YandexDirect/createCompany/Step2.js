@@ -43,7 +43,7 @@ const renderCard = (cards, setCards) => {
     return (
       <Col md='6' key={index + 'key'}>
         <Card>
-          <CardHeader>
+          <CardHeader className='d-flex justify-content-between'>
             Объявление #{index+1}
             <div className="template-header-actions">
               <button
@@ -148,7 +148,7 @@ const renderImages = (cards, images, uploadedImages, selectedImages, setSelected
       const isChecked = selectedImages.find(selectedImage => selectedImage === image.id);
       const isUploadedImage = Boolean(image.file);
 
-      const src = isUploadedImage ? URL.createObjectURL(image.file) : image.data;
+      const src = isUploadedImage ? URL.createObjectURL(image.file) : `data:${image.contentType};base64,${image.data}`;
 
       return (
         <Col

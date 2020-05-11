@@ -1,6 +1,5 @@
 import React, {useEffect} from 'react';
 import {Col, Row, Button} from "reactstrap";
-import _ from 'lodash';
 
 import {useVacancyApi} from "./useVacanciesApi";
 
@@ -14,8 +13,6 @@ const Component = (props) => {
     load(vacancyId);
   }, []);
 
-  console.log(vacancy);
-
   return (
     <div className="animated fadeIn">
       <Row>
@@ -26,40 +23,36 @@ const Component = (props) => {
               <tbody>
               <tr>
                 <th>Название:</th>
-                <td>{ vacancy.map( field => field.name ) }</td>
+                <td>{ vacancy.name }</td>
               </tr>
               <tr>
                 <th>Регион:</th>
-                <td>{ vacancy.map( field => field.region.name  ) }</td>
+                <td>{ vacancy.region.name }</td>
               </tr>
               <tr>
                 <th>Профиль:</th>
-                <td>{ vacancy.map( field => field.profile.name ) }</td>
+                <td>{ vacancy.profile.name }</td>
               </tr>
               <tr>
-                <th>Зарплата От/До:</th>
-                <td>{vacancy.map( field => field.salary.from )} - {vacancy.map( field => field.salary.to )} { vacancy.map( field => field.salary.currency) }</td>
+                <th>Зарплата От - До:</th>
+                <td>{ vacancy.salary.from } - { vacancy.salary.to } { vacancy.salary.currency }</td>
               </tr>
               <tr>
                 <th>Места:</th>
-                <td>{ vacancy.map( field => field.openPositions ) }</td>
+                <td>{ vacancy.openPositions }</td>
               </tr>
               <tr>
                 <th>Внешние ID:</th>
-                <td>{ vacancy.map( field => {
-                  return field.externalIds.map( ({id, system}) => {
-                    return system
-                  })
-                }) }</td>
+                <td>{ vacancy.externalIds.map(({id, system}) => system)}</td>
               </tr>
               <tr>
                 <th>Статус:</th>
-                <td>{ vacancy.map( field => field.status) }</td>
+                <td>{ vacancy.status }</td>
               </tr>
               </tbody>
             </table>
           </div>
-          <Button onClick={ () => props.history.goBack() }>Назад</Button>
+          <Button onClick={() => props.history.goBack() }>Назад</Button>
         </Col>
       </Row>
     </div>

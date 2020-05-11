@@ -52,8 +52,7 @@ export function useVacanciesApi() {
 }
 
 export function useVacancyApi() {
-  const [vacancy, setVacancy] = useState([
-    {
+  const [vacancy, setVacancy] = useState({
       "region": {
         "id": "",
         "name": ""
@@ -73,8 +72,7 @@ export function useVacancyApi() {
       ],
       "status": "",
       "id": ""
-    }
-   ]);
+    });
 
   const load = (vacancyId) => {
     const token = localStorage.getItem('access_token');
@@ -89,7 +87,7 @@ export function useVacancyApi() {
         return result.clone().json()
       }
     }).then((result) => {
-      setVacancy(_.filter(result.items, { 'id': vacancyId }));
+      setVacancy(_.find(result.items, { 'id': vacancyId }));
     });
   };
   return [vacancy, setVacancy, load];
@@ -98,7 +96,7 @@ export function useVacancyApi() {
 export function useVacancyPutApi() {
   const loadPut = (vacancyId, data) => {
     const token = localStorage.getItem('access_token');
-    fetch(HOST_URL + `/api/vacancies/${vacancyId}`, {
+    return fetch(HOST_URL + `/api/vacancies/${vacancyId}`, {
       method: 'PUT',
       headers: {
         'Accept': '*/*',
@@ -110,7 +108,7 @@ export function useVacancyPutApi() {
       if(result.status === 500) alert(result.status);
       if (result.status === 200) {
         alert(result.status);
-        window.location.reload();
+        return result.status === 200
       }
     });
   };

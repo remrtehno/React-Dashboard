@@ -27,15 +27,14 @@ const Component = () => {
 
   const getFields = (field) => {
     if(getAllVacancies.length === 0) return [];
+
     return getAllVacancies.reduce( (result, object) => {
       (Array.isArray(result) || (result = []));
       if(result.find( name => name.value === object[field].name)) return result;
       result.push({value: object[field].name, label: object[field].name});
       return result;
-    });
+    }, []);
   };
-
-  console.log(getAllVacancies)
 
   return (
     <div className="animated fadeIn">
@@ -79,7 +78,7 @@ const Component = () => {
               <Select
                 placeholder={"Регион"}
                 closeMenuOnSelect={true}
-                options={ [...getFields('region'), {value: null, label: 'Все'} ] }
+                options={ [...getFields('region'), {value: null, label: 'Все'}] }
                 onChange={
                   (value) => {
                     setFilters( (filters) => {

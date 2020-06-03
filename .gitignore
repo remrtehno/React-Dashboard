@@ -6,3 +6,4 @@ node_modules2/
 .idea/
 .idea
 .history/
+build/

@@ -108,6 +108,7 @@ const Component = (props) => {
 
   const exIds = vacancy.externalIds.map(field => ({ system: field.system, id: field.id }));
 
+
   return (
     <div className="animated fadeIn">
       <Row>
@@ -142,16 +143,16 @@ const Component = (props) => {
         </Col>
         <Col lg="5" className="mb-3">
           Зарплата От
-          <Input type="number" onChange={(event) => { editVacancy(+event.target.value, 'salary','from') } } value={vacancy.salary.from}/>
+          <Input type="number" onChange={(event) => { editVacancy(+event.target.value, 'salary','from') } } value={vacancy.salary ? vacancy.salary.from : ''}/>
         </Col>
         <Col lg="5" className="mb-3">
           Зарплата До
-          <Input type="number" onChange={(event) => { editVacancy(+event.target.value, 'salary','to') } } value={vacancy.salary.to}  />
+          <Input type="number" onChange={(event) => { editVacancy(+event.target.value, 'salary','to') } } value={vacancy.salary ? vacancy.salary.to : ''}  />
         </Col>
         <Col lg="2" className="mb-3">
           Валюта
           <Select
-            value={{value: vacancy.salary.currency, label: vacancy.salary.currency}}
+            value={vacancy.salary && {value: vacancy.salary.currency, label: vacancy.salary.currency}}
             closeMenuOnSelect={true}
             options={ [{value: 'Rub', label: 'Rub'}, {value: 'Usd', label: 'Usd'}, {value: 'Eur', label: 'Eur'}] }
             onChange={ (value) => { editVacancy(value.value, 'salary', 'currency')} } />

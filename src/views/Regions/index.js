@@ -6,7 +6,7 @@ import {get} from '../../api';
 
 
 const Reports = () => {
-  const [loadRegions, setLoadRegions] = useState([]);
+  const [loadRegions, setLoadRegions] = useState({items: []});
 
   useEffect(() => {
     get('/api/regions')
@@ -43,7 +43,7 @@ const Reports = () => {
                 _.map(loadRegions.items, (value, key) => {
                   return (
                     <tr key={key}>
-                      <td>{`${value.name}`}</td>
+                      <td>{value.name}</td>
                       <td  width="240">
                         { value.yandexRegions.map((region, index) => {
                             return index < value.yandexRegions.length - 1 ?

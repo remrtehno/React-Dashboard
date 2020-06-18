@@ -3,12 +3,35 @@ import {Col, Row, Button, Input} from "reactstrap";
 import _ from 'lodash';
 import Select from 'react-select';
 import Fuse from 'fuse.js';
+import { useHistory, useLocation } from 'react-router-dom'
+import qs from 'query-string'
 
 import {useVacanciesApi} from "./useVacanciesApi";
 import {Link} from "react-router-dom";
 
+const handleChangeFilters = (val, field, searchQuery, history) => {
+  let newSearchQuery = {...searchQuery}
+
+  if (val && val.value) {
+    newSearchQuery = {
+      ...newSearchQuery,
+      [field]: val.value || val
+    }
+  } else {
+    delete newSearchQuery[field]
+  }
+
+  history.push({
+    pathname: '/vacancies',
+    search: qs.stringify(newSearchQuery)
+  })
+}
 
 const Component = () => {
+  let history = useHistory()
+  let location = useLocation()
+  const pageSearch = qs.parse(location.search)
+
   const [getAllVacancies, load] = useVacanciesApi();
   const [filters, setFilters] = useState({});
   const [fuseQuery, setFuseQuery] = useState(null);
@@ -17,16 +40,20 @@ const Component = () => {
     load();
   }, []);
 
+  useEffect(() => {
+    setFilters({...pageSearch})
+  }, [location.search])
+
   let filteredVacancy = _.filter(getAllVacancies, filters);
   const fuse = new Fuse(filteredVacancy, { keys: ['name'] });
-
 
   if(fuseQuery) {
     filteredVacancy = fuse.search(fuseQuery);
   }
 
   const getFields = (field) => {
-    if(getAllVacancies.length === 0) return [];
+    if (getAllVacancies.length === 0) return [];
+    if (field === 'status') return [{value: 'active', label: 'Активные'}, {value: 'stopped', label: 'Неактивные'}, {value: null, label: 'Все'}]
 
     return getAllVacancies.reduce( (result, object) => {
       (Array.isArray(result) || (result = []));
@@ -59,19 +86,12 @@ const Component = () => {
               <Select
                 placeholder={"Статус"}
                 closeMenuOnSelect={true}
-                options={ [{value: 'active', label: 'Активные'}, {value: 'stopped', label: 'Неактивные'}, {value: null, label: 'Все'}] }
+                options={ [...getFields('status')] }
                 onChange={
-                  (value) => {
-                    setFilters(filters => {
-                      if(value.value) {
-                        return {...filters, status: value.value};
-                      } else {
-                        delete filters.status;
-                        return {...filters};
-                      }
-                    });
-                  }
+                  (value) => handleChangeFilters(value, 'status', pageSearch, history)
                 }
+                isClearable
+                value={getFields('status').find(region => region.value === pageSearch.status)}
               />
             </Col>
             <Col lg="2">
@@ -80,17 +100,10 @@ const Component = () => {
                 closeMenuOnSelect={true}
                 options={ [...getFields('region'), {value: null, label: 'Все'}] }
                 onChange={
-                  (value) => {
-                    setFilters( (filters) => {
-                      if(value.value) {
-                        return {...filters, region: {name: value.value}};
-                      } else {
-                        delete filters.region;
-                        return {...filters};
-                      }
-                    });
-                  }
+                  (value) => handleChangeFilters(value, 'region', pageSearch, history)
                 }
+                isClearable
+                value={getFields('region').find(region => region.value === pageSearch.region)}
               />
             </Col>
             <Col lg="2">
@@ -99,17 +112,11 @@ const Component = () => {
                 closeMenuOnSelect={true}
                 options={ [ ...getFields('profile'), {value: null, label: 'Все'}] }
                 onChange={
-                  (value) => {
-                    setFilters( (filters) => {
-                      if(value.value) {
-                        return {...filters, profile: {name: value.value}};
-                      } else {
-                        delete filters.profile;
-                        return {...filters};
-                      }
-                    });
-                  }
-                }/>
+                  (value) => handleChangeFilters(value, 'profile', pageSearch, history)
+                }
+                isClearable
+                value={getFields('profile').find(profile => profile.value === pageSearch.profile)}
+              />
             </Col>
             <Col lg="1">
               <Link to={`/vacancies/create`} >
@@ -124,7 +131,7 @@ const Component = () => {
                   <div key={key} className="vacancy">
                     <div className="d-flex justify-content-between">
                       <div className="name">
-                        {`${value.name}`}, {`${value.region.name}`}
+                        {value.name}, {value.region.name}
                         {_.map(value.profile.externalIds, field => { return field.system })}
                       </div>
                       <div className='d-flex flex-column align-items-end'>
@@ -150,7 +157,7 @@ const Component = () => {
                                 </div>
                               </td>
                               <td>
-                                {`${value.profile.name}`}
+                                {value.profile.name}
                               </td>
                             </tr>
                             <tr>
@@ -159,7 +166,7 @@ const Component = () => {
                                   <b>Регион:</b>
                                 </div>
                               </td>
-                              <td>{`${value.region.name}`}</td>
+                              <td>{value.region.name}</td>
                             </tr>
                             <tr>
                               <td>
@@ -167,7 +174,7 @@ const Component = () => {
                                   <b>Статус:</b>
                                 </div>
                               </td>
-                              <td>{`${value.status}`}</td>
+                              <td>{value.status}</td>
                             </tr>
                           </tbody>
                         </table>

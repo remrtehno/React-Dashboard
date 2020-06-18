@@ -159,6 +159,8 @@ const Component = () => {
     })
   }, [filterValues]);
 
+  console.log('initialData', initialData)
+
   const delayedSearch = debounce(handleSearch, 600);
 
   return (
@@ -207,10 +209,15 @@ const Component = () => {
                 <Col>
                   <Select
                     placeholder='Источник'
-                    getOptionLabel={option => option}
-                    getOptionValue={option => option}
-                    options={initialData.sources}
-                    onChange={MainSource => setFilterValues({...filterValues, MainSource})}
+                    options={initialData.sources.map(source => ({value: source, label: source}))}
+                    onChange={source => {
+                      if (source && source.value) {
+                        setFilterValues({...filterValues, MainSource: source.value})
+                      } else {
+                        setFilterValues({...filterValues, MainSource: source})
+                      }
+                    }}
+                    isClearable
                   />
                 </Col>
                 <Col>

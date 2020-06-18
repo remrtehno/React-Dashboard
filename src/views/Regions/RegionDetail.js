@@ -36,7 +36,17 @@ const Component = (props) => {
               </tr>
               <tr>
                 <th> Регионы для Яндекс.Директа: </th>
-                <td> { _.map(region.yandexRegions, ({name, id}) => { return name+', '; }) } </td>
+                <td>
+                  {
+                    _.map(region.yandexRegions, ({name, i}) => {
+                      if (i < region.yandexRegions.length-1) {
+                        return name+', '
+                      }
+
+                      return name
+                    })
+                  }
+                </td>
               </tr>
               </tbody>
             </table>

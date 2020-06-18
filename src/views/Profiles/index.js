@@ -55,7 +55,7 @@ const Component = () => {
                 <div key={key} className="vacancy">
                   <div className="d-flex justify-content-between">
                     <div className="name">
-                      {`${value.name}`}
+                      {value.name}
                     </div>
                     <div className='d-flex flex-column align-items-end'>
                       <Link to={`/profile/edit/${value.id}`} className='mb-2'>
@@ -77,7 +77,7 @@ const Component = () => {
                               <b>Занятность:</b>
                             </div>
                           </td>
-                          <td>{`${value.employment}`}</td>
+                          <td>{value.employment}</td>
                         </tr>
                         <tr>
                           <td>
@@ -85,7 +85,7 @@ const Component = () => {
                               <b>График:</b>
                             </div>
                           </td>
-                          <td>{`${value.schedule}`}</td>
+                          <td>{value.schedule}</td>
                         </tr>
                       </tbody>
                     </table>
@@ -116,7 +116,7 @@ const Component = () => {
                   </div>
                   </Col>
                   <Col lg="4">
-                    {`${value.description}`}
+                    {value.description}
                   </Col>
                 </Row>
                 </div>
